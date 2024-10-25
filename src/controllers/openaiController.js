@@ -5,7 +5,7 @@ const supabaseService = require('../services/supabaseService');
 exports.chat = async (req, res) => {
     try {
         const { catId, messages } = req.body;
-        const userId = req.user.id;
+        const userId = req.user.userId;
 
         const catDetails = await supabaseService.getCatDetails(userId, catId);
         const response = await openaiService.sendMessagesToOpenAI(catDetails, messages);
