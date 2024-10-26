@@ -704,17 +704,14 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
 
 #### 1. Get Conversations
 
-- **Endpoint**: `GET /api/supabase/chat/:user_id`
-- **Description**: Retrieves all conversations for a specific user.
+- **Endpoint**: `GET /api/supabase/conversations`
+- **Description**: Retrieves all conversations for the authenticated user.
 - **Authentication**: **Required**
 - **Request Headers**:
 
     ```
     Authorization: Bearer <JWT Token>
     ```
-
-- **Path Parameters**:
-  - `user_id`: ID of the user.
 
 - **Responses**:
   - **200 OK**:
@@ -723,34 +720,15 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     [
       {
         "id": 1,
-        "started_at": "2023-06-01T12:00:00Z",
-        "messages": [
-          {
-            "content": "Hello, how are you?",
-            "role": "user",
-            "timestamp": "2023-06-01T12:05:00Z"
-          },
-          {
-            "content": "I'm good, thank you!",
-            "role": "assistant",
-            "timestamp": "2023-06-01T12:06:00Z"
-          }
-        ]
+        "user_id": 36,
+        "started_at": "2023-06-01T12:00:00Z"
       },
       {
         "id": 2,
-        "started_at": "2023-06-02T14:00:00Z",
-        "messages": []
+        "user_id": 36,
+        "started_at": "2023-06-02T14:00:00Z"
       }
     ]
-    ```
-
-  - **401 Unauthorized**:
-
-    ```json
-    {
-      "error": "Authentication token is missing"
-    }
     ```
 
   - **404 Not Found**:
@@ -769,10 +747,126 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     }
     ```
 
-#### 2. Post Chat Message
+#### 2. Create a New Conversation
+
+- **Endpoint**: `POST /api/supabase/conversations`
+- **Description**: Creates a new conversation for the authenticated user.
+- **Authentication**: **Required**
+- **Request Headers**:
+
+    ```
+    Authorization: Bearer <JWT Token>
+    ```
+
+- **Responses**:
+  - **201 Created**:
+
+    ```json
+    {
+      "conversation_id": 1
+    }
+    ```
+
+  - **500 Internal Server Error**:
+
+    ```json
+    {
+      "error": "An error occurred while creating the conversation"
+    }
+    ```
+
+#### 3. Update a Conversation
+
+- **Endpoint**: `PUT /api/supabase/conversations/:id`
+- **Description**: Updates an existing conversation.
+- **Authentication**: **Required**
+- **Request Headers**:
+
+    ```
+    Authorization: Bearer <JWT Token>
+    ```
+
+- **Path Parameters**:
+  - `id`: Conversation ID.
+
+- **Request Body**:
+
+    ```json
+    {
+      "started_at": "2023-06-01T13:00:00Z"
+    }
+    ```
+
+- **Responses**:
+  - **200 OK**:
+
+    ```json
+    {
+      "id": 1,
+      "user_id": 36,
+      "started_at": "2023-06-01T13:00:00Z"
+    }
+    ```
+
+  - **500 Internal Server Error**:
+
+    ```json
+    {
+      "error": "An error occurred while updating the conversation"
+    }
+    ```
+
+#### 4. Delete a Conversation
+
+- **Endpoint**: `DELETE /api/supabase/conversations/:id`
+- **Description**: Deletes a specific conversation.
+- **Authentication**: **Required**
+- **Request Headers**:
+
+    ```
+    Authorization: Bearer <JWT Token>
+    ```
+
+- **Path Parameters**:
+  - `id`: Conversation ID.
+
+- **Responses**:
+  - **200 OK**:
+
+    ```json
+    {
+      "message": "Conversation deleted successfully"
+    }
+    ```
+
+  - **403 Forbidden**:
+
+    ```json
+    {
+      "error": "User not authorized to delete this conversation"
+    }
+    ```
+
+  - **404 Not Found**:
+
+    ```json
+    {
+      "error": "Conversation not found"
+    }
+    ```
+
+  - **500 Internal Server Error**:
+
+    ```json
+    {
+      "error": "An error occurred while deleting the conversation"
+    }
+    ```
+
+#### 5. Post Chat Message
 
 - **Endpoint**: `POST /api/supabase/chat`
-- **Description**: Adds a new message to a conversation or creates a new conversation if it doesn't exist.
+- **Description**: Adds a new message to a conversation.
 - **Authentication**: **Required**
 - **Request Headers**:
 
@@ -815,15 +909,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
 
     ```json
     {
-      "error": "Messages must be a non-empty array" // or other validation errors
-    }
-    ```
-
-  - **401 Unauthorized**:
-
-    ```json
-    {
-      "error": "Authentication token is missing"
+      "error": "Invalid input" // or other validation errors
     }
     ```
 
@@ -848,53 +934,6 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     ```json
     {
       "error": "An error occurred while processing the chat message"
-    }
-    ```
-
-#### 3. Delete a Conversation
-
-- **Endpoint**: `DELETE /api/supabase/chat/conversation/:id`
-- **Description**: Deletes a specific conversation.
-- **Authentication**: **Required**
-- **Request Headers**:
-
-    ```
-    Authorization: Bearer <JWT Token>
-    ```
-
-- **Path Parameters**:
-  - `id`: Conversation ID.
-
-- **Responses**:
-  - **200 OK**:
-
-    ```json
-    {
-      "message": "Conversation deleted successfully"
-    }
-    ```
-
-  - **403 Forbidden**:
-
-    ```json
-    {
-      "error": "User not authorized to delete this conversation"
-    }
-    ```
-
-  - **404 Not Found**:
-
-    ```json
-    {
-      "error": "Conversation not found"
-    }
-    ```
-
-  - **500 Internal Server Error**:
-
-    ```json
-    {
-      "error": "An error occurred while deleting the conversation"
     }
     ```
 

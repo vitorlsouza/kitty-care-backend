@@ -18,10 +18,11 @@ router.post('/cats', authenticateToken, validateCreateCat, supabaseController.cr
 router.put('/cats/:id', authenticateToken, validateUpdateCat, supabaseController.updateCat);
 router.delete('/cats/:id', authenticateToken, supabaseController.deleteCat);
 
-router.get('/chat/:user_id', authenticateToken, supabaseController.getConversations);
 router.post('/chat', authenticateToken, validateChatMessage, supabaseController.postChatMessage);
 
-router.post('/chat/conversation', authenticateToken, supabaseController.createConversation);
-router.delete('/chat/conversation/:id', authenticateToken, supabaseController.deleteConversation);
+router.get('/conversations', authenticateToken, supabaseController.getConversations);
+router.post('/conversations', authenticateToken, supabaseController.createConversation);
+router.put('/conversations/:id', authenticateToken, supabaseController.updateConversation);
+router.delete('/conversations/:id', authenticateToken, supabaseController.deleteConversation);
 
 module.exports = router;

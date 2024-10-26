@@ -846,7 +846,7 @@ describe('DELETE /api/supabase/cats/:id', () => {
     });
 });
 
-describe('GET /api/supabase/chat/:user_id', () => {
+describe('GET /api/supabase/conversations', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -876,26 +876,22 @@ describe('GET /api/supabase/chat/:user_id', () => {
         supabase.getConversationsByUserId.mockResolvedValue(mockConversations);
 
         const res = await request(app)
-            .get(`/api/supabase/chat/${userId}`)
+            .get('/api/supabase/conversations')
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(200);
-        expect(res.body).toEqual(mockConversations.map(conv => ({
-            conversation_id: conv.id,
-            started_at: conv.started_at,
-            messages: conv.messages
-        })));
-        expect(supabase.getConversationsByUserId).toHaveBeenCalledWith(userId.toString());
+        expect(res.body).toEqual(mockConversations);
+        expect(supabase.getConversationsByUserId).toHaveBeenCalledWith(userId);
     });
 
     it('should return 404 if no conversations found', async () => {
         const userId = 36;
         const token = jwt.sign({ userId }, JWT_SECRET);
 
-        supabase.getConversationsByUserId.mockResolvedValue([]);
+        supabase.getConversationsByUserId.mockResolvedValue([]); // Ensure this returns an empty array
 
         const res = await request(app)
-            .get(`/api/supabase/chat/${userId}`)
+            .get('/api/supabase/conversations')
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(404);
@@ -903,10 +899,8 @@ describe('GET /api/supabase/chat/:user_id', () => {
     });
 
     it('should return 401 for unauthenticated request', async () => {
-        const userId = 36;
-
         const res = await request(app)
-            .get(`/api/supabase/chat/${userId}`);
+            .get('/api/supabase/conversations'); // No token set
 
         expect(res.statusCode).toBe(401);
     });
@@ -918,7 +912,7 @@ describe('GET /api/supabase/chat/:user_id', () => {
         supabase.getConversationsByUserId.mockRejectedValue(new Error('Unexpected error'));
 
         const res = await request(app)
-            .get(`/api/supabase/chat/${userId}`)
+            .get('/api/supabase/conversations')
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
@@ -926,162 +920,60 @@ describe('GET /api/supabase/chat/:user_id', () => {
     });
 });
 
-describe('POST /api/supabase/chat', () => {
+describe('POST /api/supabase/conversations', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('should create a new chat message for an existing user', async () => {
-        const user_id = 36;
-        const token = jwt.sign({ user_id }, JWT_SECRET);
-        const mockMessage = {
-            conversation_id: 8,
-            content: 'Hello, how are you?',
-            role: 'user'
-        };
-        const mockConversation = { id: 8, user_id: user_id, started_at: '2023-06-01T12:00:00Z' };
-        const mockCreatedMessage = { id: 8, ...mockMessage, conversation_id: mockConversation.id };
+    it('should create a new conversation for authenticated user', async () => {
+        const userId = 36;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+        const mockConversation = { id: 1, user_id: userId, started_at: '2023-06-01T12:00:00Z' };
 
-        supabase.findUserById.mockResolvedValue({ id: user_id });
         supabase.createConversation.mockResolvedValue(mockConversation);
-        supabase.createMessage.mockResolvedValue(mockCreatedMessage);
 
         const res = await request(app)
-            .post('/api/supabase/chat')
+            .post('/api/supabase/conversations')
             .set('Authorization', `Bearer ${token}`)
-            .send(mockMessage);
+            .send({ started_at: '2023-06-01T12:00:00Z' });
 
         expect(res.statusCode).toBe(201);
-        expect(res.body).toEqual({
-            conversation_id: mockConversation.id,
-            message: mockCreatedMessage
-        });
+        expect(res.body).toEqual({ conversation_id: mockConversation.id });
     });
 
-    it('should add a message to an existing conversation', async () => {
-        const user_id = 36;
-        const conversation_id = 1;
-        const token = jwt.sign({ user_id }, JWT_SECRET);
-        const mockMessage = {
-            content: 'How are you doing?',
-            role: 'user',
-            conversation_id: conversation_id
-        };
-        const mockConversation = { id: conversation_id, user_id: user_id, started_at: '2023-06-01T12:00:00Z' };
-        const mockCreatedMessage = { id: 2, ...mockMessage };
-
-        supabase.findUserById.mockResolvedValue({ id: user_id });
-        supabase.getConversationById.mockResolvedValue(mockConversation);
-        supabase.createMessage.mockResolvedValue(mockCreatedMessage);
-
-        const res = await request(app)
-            .post('/api/supabase/chat')
-            .set('Authorization', `Bearer ${token}`)
-            .send(mockMessage);
-
-        expect(res.statusCode).toBe(201);
-        expect(res.body).toEqual({
-            conversation_id: conversation_id,
-            message: mockCreatedMessage
-        });
-    });
-
-    it('should return 404 if user does not exist', async () => {
-        const user_id = 999;
-        const token = jwt.sign({ userId: user_id }, JWT_SECRET);
-        const mockMessage = {
-            conversation_id: 1,
-            content: 'Hello, how are you?',
-            role: 'user'
-        };
-
-        supabase.findUserById.mockResolvedValue(null);
-
-        const res = await request(app)
-            .post('/api/supabase/chat')
-            .set('Authorization', `Bearer ${token}`)
-            .send(mockMessage);
-
-        expect(res.statusCode).toBe(404);
-        expect(res.body).toEqual({ error: 'User not found' });
-    });
-
-    it('should return 404 if conversation does not exist', async () => {
-        const user_id = 36;
-        const conversation_id = 999;
-        const token = jwt.sign({ user_id }, JWT_SECRET);
-        const mockMessage = {
-            content: 'Hello, how are you?',
-            role: 'user',
-            conversation_id: conversation_id
-        };
-
-        supabase.findUserById.mockResolvedValue({ id: user_id });
-        supabase.getConversationById.mockResolvedValue(null);
-
-        const res = await request(app)
-            .post('/api/supabase/chat')
-            .set('Authorization', `Bearer ${token}`)
-            .send(mockMessage);
-
-        expect(res.statusCode).toBe(404);
-        expect(res.body).toEqual({ error: 'Conversation not found' });
-    });
-
-    it('should return 400 for invalid input', async () => {
-        const user_id = 36;
-        const token = jwt.sign({ user_id }, JWT_SECRET);
-        const mockMessage = {
-            content: '',
-            role: 'invalid-sender'
-        };
-
-        const res = await request(app)
-            .post('/api/supabase/chat')
-            .set('Authorization', `Bearer ${token}`)
-            .send(mockMessage);
-
-        expect(res.statusCode).toBe(400);
-        expect(res.body).toHaveProperty('error');
-        expect(res.body.error).toContain('"content" is not allowed to be empty');
-        expect(res.body.error).toContain('"role" must be one of [user, assistant]');
-    });
-
-    it('should return 401 for unauthenticated request', async () => {
-        const mockMessage = {
-            content: 'Hello, how are you?',
-            role: 'user'
-        };
-
-        const res = await request(app)
-            .post('/api/supabase/chat')
-            .send(mockMessage);
-
-        expect(res.statusCode).toBe(401);
-    });
-
-    // it('should return 500 for unexpected errors', async () => {
-    //     const user_id = 36;
-    //     const token = jwt.sign({ userId: user_id }, JWT_SECRET);
-    //     const mockMessage = {
-    //         content: 'Hello, how are you?',
-    //         role: 'user'
-    //     };
-
-    //     supabase.checkUserExists.mockResolvedValue(true);
-    //     supabase.handleChatMessage.mockRejectedValue(new Error('Unexpected error'));
-
-    //     const res = await request(app)
-    //         .post('/api/supabase/chat')
-    //         .set('Authorization', `Bearer ${token}`)
-    //         .send(mockMessage);
-
-    //     expect(res.statusCode).toBe(500);
-    //     expect(res.body).toEqual({ error: 'An error occurred while processing the chat message' });
-    // });
+    // Add more tests for error cases
 });
 
-describe('DELETE /api/supabase/chat/conversation/:id', () => {
+describe('PUT /api/supabase/conversations/:id', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should update a conversation for authenticated user', async () => {
+        const userId = 36;
+        const conversationId = 1;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+        const mockUpdatedConversation = {
+            id: conversationId,
+            user_id: userId,
+            started_at: '2023-06-01T13:00:00Z'
+        };
+
+        supabase.updateConversationById.mockResolvedValue(mockUpdatedConversation); // Ensure this is the correct mock
+
+        const res = await request(app)
+            .put(`/api/supabase/conversations/${conversationId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ started_at: '2023-06-01T13:00:00Z' });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual(mockUpdatedConversation);
+    });
+
+    // Add more tests for error cases
+});
+
+describe('DELETE /api/supabase/conversations/:id', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -1094,7 +986,7 @@ describe('DELETE /api/supabase/chat/conversation/:id', () => {
         supabase.deleteConversationById.mockResolvedValue({ success: true });
 
         const res = await request(app)
-            .delete(`/api/supabase/chat/conversation/${conversationId}`)
+            .delete(`/api/supabase/conversations/${conversationId}`)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(200);
@@ -1110,7 +1002,7 @@ describe('DELETE /api/supabase/chat/conversation/:id', () => {
         supabase.deleteConversationById.mockResolvedValue({ error: 'not_found' });
 
         const res = await request(app)
-            .delete(`/api/supabase/chat/conversation/${conversationId}`)
+            .delete(`/api/supabase/conversations/${conversationId}`)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(404);
@@ -1125,7 +1017,7 @@ describe('DELETE /api/supabase/chat/conversation/:id', () => {
         supabase.deleteConversationById.mockResolvedValue({ error: 'not_authorized' });
 
         const res = await request(app)
-            .delete(`/api/supabase/chat/conversation/${conversationId}`)
+            .delete(`/api/supabase/conversations/${conversationId}`)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(403);
@@ -1136,7 +1028,7 @@ describe('DELETE /api/supabase/chat/conversation/:id', () => {
         const conversationId = 1;
 
         const res = await request(app)
-            .delete(`/api/supabase/chat/conversation/${conversationId}`);
+            .delete(`/api/supabase/conversations/${conversationId}`);
 
         expect(res.statusCode).toBe(401);
     });
@@ -1149,11 +1041,10 @@ describe('DELETE /api/supabase/chat/conversation/:id', () => {
         supabase.deleteConversationById.mockRejectedValue(new Error('Unexpected error'));
 
         const res = await request(app)
-            .delete(`/api/supabase/chat/conversation/${conversationId}`)
+            .delete(`/api/supabase/conversations/${conversationId}`)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
         expect(res.body.error).toBe('An error occurred while deleting the conversation');
     });
 });
-

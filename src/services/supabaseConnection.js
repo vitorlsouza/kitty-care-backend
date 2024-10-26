@@ -297,3 +297,16 @@ module.exports.deleteConversationById = async (conversationId, userId) => {
     if (deleteConversationError) throw deleteConversationError;
     return { success: true };
 };
+
+module.exports.updateConversationById = async (conversationId, userId, conversationData) => {
+    const { data, error } = await supabase
+        .from('conversations')
+        .update(conversationData)
+        .eq('id', conversationId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
+};

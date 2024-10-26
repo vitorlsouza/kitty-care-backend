@@ -214,14 +214,14 @@ const deleteCat = async (req, res) => {
 
 const getConversations = async (req, res) => {
     try {
-        const userId = req.params.user_id;
+        const userId = req.user.userId;
         const conversations = await supabaseService.getConversations(userId);
 
-        if (conversations.length === 0) {
-            return res.status(404).json({ message: "No conversations found for this user." });
+        if (conversations.message) {
+            return res.status(404).json({ message: conversations.message });
         }
 
-        res.json(conversations);
+        res.status(200).json(conversations);
     } catch (error) {
         console.error("Get conversations error:", error);
         res.status(500).json({ error: "An error occurred while fetching the conversations" });
@@ -285,6 +285,20 @@ const createConversation = async (req, res) => {
     }
 };
 
+const updateConversation = async (req, res) => {
+    try {
+        const conversationId = req.params.id;
+        const userId = req.user.userId;
+        const conversationData = req.body;
+
+        const updatedConversation = await supabaseService.updateConversation(conversationId, userId, conversationData);
+        res.status(200).json(updatedConversation);
+    } catch (error) {
+        console.error("Update conversation error:", error);
+        res.status(500).json({ error: "An error occurred while updating the conversation" });
+    }
+};
+
 module.exports = {
     signup,
     signin,
@@ -300,4 +314,5 @@ module.exports = {
     postChatMessage,
     deleteConversation,
     createConversation,
+    updateConversation
 };
