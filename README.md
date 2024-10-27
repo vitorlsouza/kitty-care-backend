@@ -820,7 +820,6 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     ```
 
 - **Validation Rules**:
-  - `started_at`: Optional, must be a valid ISO 8601 date.
   - `messages`: Required, non-empty array of objects with:
     - `role`: Required, either `user` or `assistant`.
     - `content`: Required, string.
@@ -830,15 +829,8 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
 
     ```json
     {
-      "id": 1,
-      "user_id": 36,
-      "started_at": "2023-06-01T13:00:00Z",
-      "messages": [
-        {
-          "role": "user",
-          "content": "Hello, how are you?"
-        }
-      ]
+      "success": true,
+      "message": "Conversation updated successfully"
     }
     ```
 
