@@ -298,10 +298,10 @@ module.exports.deleteConversationById = async (conversationId, userId) => {
     return { success: true };
 };
 
-module.exports.updateConversationById = async (conversationId, userId, conversationData) => {
+module.exports.updateConversationById = async (conversationId, userId, started_at) => {
     const { data, error } = await supabase
         .from('conversations')
-        .update(conversationData)
+        .update({ started_at })
         .eq('id', conversationId)
         .eq('user_id', userId)
         .select()

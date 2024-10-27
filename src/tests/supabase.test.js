@@ -857,17 +857,17 @@ describe('GET /api/supabase/conversations', () => {
         const mockConversations = [
             {
                 id: 1,
-                started_at: '2023-06-01T12:00:00Z',
+                started_at: '2029-06-01T12:00:00Z',
                 messages: [
                     {
                         message: 'Hello',
                         sent_by: 'user',
-                        timestamp: '2023-06-01T12:00:00Z'
+                        timestamp: '2029-06-01T12:00:00Z'
                     },
                     {
                         message: 'Hi there!',
                         sent_by: 'system',
-                        timestamp: '2023-06-01T12:01:00Z'
+                        timestamp: '2029-06-01T12:01:00Z'
                     }
                 ]
             }
@@ -928,14 +928,13 @@ describe('POST /api/supabase/conversations', () => {
     it('should create a new conversation for authenticated user', async () => {
         const userId = 36;
         const token = jwt.sign({ userId }, JWT_SECRET);
-        const mockConversation = { id: 1, user_id: userId, started_at: '2023-06-01T12:00:00Z' };
+        const mockConversation = { id: 8, user_id: userId, started_at: '2029-06-01T12:00:00Z' };
 
         supabase.createConversation.mockResolvedValue(mockConversation);
 
         const res = await request(app)
             .post('/api/supabase/conversations')
-            .set('Authorization', `Bearer ${token}`)
-            .send({ started_at: '2023-06-01T12:00:00Z' });
+            .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(201);
         expect(res.body).toEqual({ conversation_id: mockConversation.id });
@@ -951,12 +950,19 @@ describe('PUT /api/supabase/conversations/:id', () => {
 
     it('should update a conversation for authenticated user', async () => {
         const userId = 36;
-        const conversationId = 1;
+        const conversationId = 8;
         const token = jwt.sign({ userId }, JWT_SECRET);
+
         const mockUpdatedConversation = {
             id: conversationId,
             user_id: userId,
-            started_at: '2023-06-01T13:00:00Z'
+            started_at: '2029-06-01T13:00:00Z',
+            messages: [
+                {
+                    role: 'user',
+                    content: 'Hello, how are you?'
+                }
+            ]
         };
 
         supabase.updateConversationById.mockResolvedValue(mockUpdatedConversation); // Ensure this is the correct mock
@@ -964,7 +970,7 @@ describe('PUT /api/supabase/conversations/:id', () => {
         const res = await request(app)
             .put(`/api/supabase/conversations/${conversationId}`)
             .set('Authorization', `Bearer ${token}`)
-            .send({ started_at: '2023-06-01T13:00:00Z' });
+            .send({ started_at: '2029-06-01T13:00:00Z', messages: [{ role: 'user', content: 'Hello, how are you?' }] });
 
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual(mockUpdatedConversation);

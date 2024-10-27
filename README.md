@@ -793,7 +793,13 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
 
     ```json
     {
-      "started_at": "2023-06-01T13:00:00Z"
+      "started_at": "2023-06-01T13:00:00Z",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello, how are you?"
+        }
+      ]
     }
     ```
 
@@ -804,7 +810,13 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     {
       "id": 1,
       "user_id": 36,
-      "started_at": "2023-06-01T13:00:00Z"
+      "started_at": "2023-06-01T13:00:00Z",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello, how are you?"
+        }
+      ]
     }
     ```
 

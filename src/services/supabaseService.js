@@ -278,7 +278,16 @@ const createNewConversation = async (userId, startedAt) => {
 
 const updateConversation = async (conversationId, userId, conversationData) => {
     try {
-        const updatedConversation = await updateConversationById(conversationId, userId, conversationData);
+        const { started_at, messages } = conversationData;
+
+        // update started_at
+        const updatedConversation = await updateConversationById(conversationId, userId, started_at);
+
+        // create messages
+        for (const message of messages) {
+            await createMessage(conversationId, userId, message.content, message.role);
+        }
+
         return updatedConversation;
     } catch (error) {
         throw error;
@@ -304,5 +313,6 @@ module.exports = {
     deleteConversation,
     getCatDetails,
     createNewConversation,
-    updateConversation
+    updateConversation,
+    createConversation
 };

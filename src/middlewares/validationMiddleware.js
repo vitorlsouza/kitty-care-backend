@@ -230,4 +230,21 @@ const validateOpenAIChat = (req, res, next) => {
     next();
 };
 
-module.exports = { validateInput, validateSignup, validateSignin, validateCreateSubscription, validateUpdateSubscription, validateCreateCat, validateUpdateCat, validateChatMessage, validateOpenAIChat };
+const updateConversationSchema = Joi.object({
+    started_at: Joi.date().iso(),
+    messages: Joi.array().items(Joi.object({
+        role: Joi.string().valid('user', 'assistant').required(),
+        content: Joi.string().required()
+    })).min(1).required()
+});
+
+const validateUpdateConversation = (req, res, next) => {
+    const { error } = updateConversationSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        const errors = error.details.map(detail => detail.message);
+        return res.status(400).json({ errors });
+    }
+    next();
+};
+
+module.exports = { validateInput, validateSignup, validateSignin, validateCreateSubscription, validateUpdateSubscription, validateCreateCat, validateUpdateCat, validateChatMessage, validateOpenAIChat, validateUpdateConversation };

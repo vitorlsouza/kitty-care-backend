@@ -125,7 +125,7 @@ const deleteSubscription = async (req, res) => {
             return res.status(result.status).json({ error: result.error });
         }
 
-        res.status(200).json({ message: "Subscription successfully deleted" });
+        res.status(200).json({ message: result.message });
     } catch (error) {
         console.error("Error in deleteSubscription controller:", error);
         if (error.message === "Subscription not found") {
@@ -274,11 +274,15 @@ const deleteConversation = async (req, res) => {
 const createConversation = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const startedAt = new Date().toISOString();
+        const started_at = new Date().toISOString();
 
-        const conversation = await supabaseService.createNewConversation(userId, startedAt);
+        const result = await supabaseService.createConversation(userId, started_at);
 
-        res.status(201).json({ conversation_id: conversation.id });
+        if (result.error) {
+            return res.status(400).json({ error: result.error });
+        }
+
+        res.status(201).json({ conversation_id: result.id });
     } catch (error) {
         console.error("Create conversation error:", error);
         res.status(500).json({ error: "An error occurred while creating the conversation" });
@@ -287,12 +291,26 @@ const createConversation = async (req, res) => {
 
 const updateConversation = async (req, res) => {
     try {
-        const conversationId = req.params.id;
+        const { id } = req.params;
+        const { started_at, messages } = req.body;
         const userId = req.user.userId;
-        const conversationData = req.body;
 
-        const updatedConversation = await supabaseService.updateConversation(conversationId, userId, conversationData);
-        res.status(200).json(updatedConversation);
+        const errors = [];
+        if (!Array.isArray(messages)) {
+            errors.push('"messages" must be an array');
+        }
+
+        if (errors.length > 0) {
+            return res.status(400).json({ errors });
+        }
+
+        const result = await supabaseService.updateConversation(id, userId, { started_at, messages });
+
+        if (!result) {
+            return res.status(404).json({ error: 'Conversation not found or user not authorized' });
+        }
+
+        res.status(200).json(result);
     } catch (error) {
         console.error("Update conversation error:", error);
         res.status(500).json({ error: "An error occurred while updating the conversation" });
