@@ -159,7 +159,7 @@ module.exports.updateCatById = async (catId, userId, catData) => {
         .select()
         .single();
 
-    if (error) throw error;
+    if (error) return null;
     return data;
 };
 

@@ -715,7 +715,7 @@ describe('PUT /api/supabase/cats/:id', () => {
             });
 
         expect(res.statusCode).toBe(404);
-        expect(res.body.error).toBe('Cat not found or user not authorized');
+        expect(res.body.error).toBe('Cat not found');
     });
 
     it('should return 400 for invalid input', async () => {

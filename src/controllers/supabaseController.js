@@ -188,7 +188,7 @@ const updateCat = async (req, res) => {
         res.json(updatedCat);
     } catch (error) {
         console.error("Update cat error:", error);
-        if (error.message === "Cat not found or user not authorized") {
+        if (error.message === "Cat not found") {
             res.status(404).json({ error: error.message });
         } else {
             res.status(500).json({ error: "An error occurred while updating the cat" });

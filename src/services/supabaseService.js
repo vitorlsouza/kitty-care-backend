@@ -163,7 +163,7 @@ const updateCatRecommendations = async (catId, recommendations) => {
 const updateCat = async (catId, userId, catData) => {
     const updatedCat = await updateCatById(catId, userId, catData);
     if (!updatedCat) {
-        throw new Error("Cat not found or user not authorized");
+        throw new Error("Cat not found");
     }
 
     // Check if we need to update AI recommendations
