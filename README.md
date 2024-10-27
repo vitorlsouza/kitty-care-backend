@@ -713,6 +713,9 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     Authorization: Bearer <JWT Token>
     ```
 
+- **Query Parameters**:
+  - `conversationId` (optional): If provided, returns details for a specific conversation.
+
 - **Responses**:
   - **200 OK**:
 
@@ -721,12 +724,25 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       {
         "id": 1,
         "user_id": 36,
-        "started_at": "2023-06-01T12:00:00Z"
+        "started_at": "2023-06-01T12:00:00Z",
+        "messages": [
+          {
+            "content": "Hello",
+            "role": "user",
+            "timestamp": "2023-06-01T12:00:00Z"
+          },
+          {
+            "content": "Hi there!",
+            "role": "assistant",
+            "timestamp": "2023-06-01T12:01:00Z"
+          }
+        ]
       },
       {
         "id": 2,
         "user_id": 36,
-        "started_at": "2023-06-02T14:00:00Z"
+        "started_at": "2023-06-02T14:00:00Z",
+        "messages": []
       }
     ]
     ```
@@ -803,6 +819,12 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     }
     ```
 
+- **Validation Rules**:
+  - `started_at`: Optional, must be a valid ISO 8601 date.
+  - `messages`: Required, non-empty array of objects with:
+    - `role`: Required, either `user` or `assistant`.
+    - `content`: Required, string.
+
 - **Responses**:
   - **200 OK**:
 
@@ -817,6 +839,26 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
           "content": "Hello, how are you?"
         }
       ]
+    }
+    ```
+
+  - **400 Bad Request**:
+
+    ```json
+    {
+      "errors": [
+        "Messages must be a non-empty array",
+        "Role must be one of: user, assistant",
+        "Content is required"
+      ]
+    }
+    ```
+
+  - **404 Not Found**:
+
+    ```json
+    {
+      "error": "Conversation not found or user not authorized"
     }
     ```
 
