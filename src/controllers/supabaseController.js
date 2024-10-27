@@ -310,7 +310,7 @@ const updateConversation = async (req, res) => {
         const result = await supabaseService.updateConversation(id, userId, messages);
 
         if (!result) {
-            return res.status(404).json({ error: 'Conversation not found or user not authorized' });
+            return res.status(404).json({ error: 'Conversation not found' });
         }
 
         res.status(200).json(result);

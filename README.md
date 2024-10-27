@@ -850,7 +850,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
 
     ```json
     {
-      "error": "Conversation not found or user not authorized"
+      "error": "Conversation not found"
     }
     ```
 
