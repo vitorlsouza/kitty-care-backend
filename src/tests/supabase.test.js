@@ -368,7 +368,7 @@ describe('DELETE /api/supabase/subscriptions/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(200);
-        expect(res.body.message).toBe('Subscription successfully deleted');
+        expect(res.body.message).toBe('Subscription deleted successfully');
         expect(supabase.deleteSubscriptionForUserId).toHaveBeenCalledWith(subscriptionId.toString(), userId);
     });
 

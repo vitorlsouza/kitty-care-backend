@@ -20,7 +20,8 @@ const {
     findUserById,
     deleteConversationById,
     getCatDetailsById,
-    getConversationsByConversationId
+    getConversationsByConversationId,
+    updateConversationById
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
