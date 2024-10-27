@@ -20,7 +20,7 @@ const {
     findUserById,
     deleteConversationById,
     getCatDetailsById,
-    updateConversationById
+    getConversationsByConversationId
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
@@ -201,9 +201,9 @@ const deleteCat = async (catId, userId) => {
     };
 };
 
-const getConversations = async (userId, conversationId = null) => {
+const getConversations = async (userId) => {
     try {
-        const conversations = await getConversationsByUserId(userId, conversationId);
+        const conversations = await getConversationsByUserId(userId);
         return conversations.length > 0 ? conversations : { message: "No conversations found for this user." };
     } catch (error) {
         throw error;
@@ -294,6 +294,21 @@ const updateConversation = async (conversationId, userId, conversationData) => {
     }
 };
 
+const getConversationByConversationId = async (userId, conversationId) => {
+    try {
+        const conversation = await getConversationsByConversationId(userId, conversationId);
+        if (!conversation) {
+            throw new Error('Conversation not found');
+        }
+        return conversation;
+    } catch (error) {
+        if (error.code === 'PGRST116') {
+            return null; // Conversation not found
+        }
+        throw error;
+    }
+};
+
 module.exports = {
     signupUser,
     signinUser,
@@ -314,5 +329,6 @@ module.exports = {
     getCatDetails,
     createNewConversation,
     updateConversation,
-    createConversation
+    createConversation,
+    getConversationByConversationId
 };

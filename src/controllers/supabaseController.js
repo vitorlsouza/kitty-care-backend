@@ -318,6 +318,42 @@ const updateConversation = async (req, res) => {
     }
 };
 
+// Add these two new functions:
+
+const getAllConversations = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const conversations = await supabaseService.getConversations(userId);
+
+        if (conversations.length === 0) {
+            return res.status(404).json({ message: "No conversations found for this user." });
+        }
+
+        res.status(200).json(conversations);
+    } catch (error) {
+        console.error("Get all conversations error:", error);
+        res.status(500).json({ error: "An error occurred while fetching the conversations" });
+    }
+};
+
+const getConversationByConversationId = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const conversationId = req.params.id;
+        const conversation = await supabaseService.getConversationByConversationId(userId, conversationId);
+
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation not found." });
+        }
+
+        res.status(200).json(conversation);
+    } catch (error) {
+        console.error("Get conversation by ID error:", error);
+        res.status(500).json({ error: "An error occurred while fetching the conversation" });
+    }
+};
+
+// Update the module.exports to include these new functions:
 module.exports = {
     signup,
     signin,
@@ -334,4 +370,6 @@ module.exports = {
     deleteConversation,
     createConversation,
     updateConversation,
+    getAllConversations,
+    getConversationByConversationId,
 };

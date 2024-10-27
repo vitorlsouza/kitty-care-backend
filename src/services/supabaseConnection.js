@@ -193,8 +193,10 @@ module.exports.deleteCatById = async (catId, userId) => {
     return { success: true };
 };
 
-module.exports.getConversationsByUserId = async (userId, conversationId = null) => {
-    let query = supabase.from('conversations').select(`
+module.exports.getConversationsByUserId = async (userId) => {
+    const { data, error } = await supabase
+        .from('conversations')
+        .select(`
             id,
             started_at,
             messages (
@@ -202,14 +204,22 @@ module.exports.getConversationsByUserId = async (userId, conversationId = null) 
                 role,
                 timestamp
             )
-        `);
+        `)
+        .eq('user_id', userId)
+        .order('started_at', { ascending: false });
 
-    if (conversationId) {
-        query = query.eq('id', conversationId);
-    }
-    query = query.eq('user_id', userId).order('started_at', { ascending: false });
+    if (error) throw error;
+    return data;
+};
 
-    const { data, error } = await query;
+module.exports.getConversationsByConversationId = async (userId, conversationId) => {
+    const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('id', conversationId)
+        .eq('user_id', userId)
+        .single();
+
     if (error) throw error;
     return data;
 };
