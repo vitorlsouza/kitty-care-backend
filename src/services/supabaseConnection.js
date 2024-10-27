@@ -216,7 +216,14 @@ module.exports.getConversationsByUserId = async (userId) => {
 module.exports.getConversationsByConversationId = async (userId, conversationId) => {
     const { data, error } = await supabase
         .from('conversations')
-        .select('*')
+        .select(`
+            id,
+            started_at,
+            messages (
+                content,
+                role,
+                timestamp
+        `)
         .eq('id', conversationId)
         .eq('user_id', userId)
         .single();
