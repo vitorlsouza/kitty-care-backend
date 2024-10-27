@@ -223,6 +223,7 @@ module.exports.getConversationsByConversationId = async (userId, conversationId)
                 content,
                 role,
                 timestamp
+            )
         `)
         .eq('id', conversationId)
         .eq('user_id', userId)
