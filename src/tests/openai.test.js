@@ -39,7 +39,7 @@ describe('POST /api/openai/chat', () => {
 
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('OpenAI response');
-        expect(supabaseService.getCatDetails).toHaveBeenCalledWith(mockUserId, mockCatId);
+        expect(supabaseService.getCatDetails).toHaveBeenCalledWith(mockCatId);
         expect(openaiService.sendMessagesToOpenAI).toHaveBeenCalledWith(mockCatDetails, mockMessages);
     });
 

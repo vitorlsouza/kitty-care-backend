@@ -325,8 +325,8 @@ const getAllConversations = async (req, res) => {
         const userId = req.user.userId;
         const conversations = await supabaseService.getConversations(userId);
 
-        if (conversations.length === 0) {
-            return res.status(404).json({ message: "No conversations found for this user." });
+        if (conversations.message) {
+            return res.status(404).json({ message: conversations.message });
         }
 
         res.status(200).json(conversations);
