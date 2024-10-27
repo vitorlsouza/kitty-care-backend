@@ -954,7 +954,7 @@ describe('POST /api/supabase/conversations', () => {
             .set('Authorization', 'Bearer invalid_token');
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.error).toBe('Invalid token');
+        expect(res.body.error).toBe('Invalid token. User not authenticated.');
     });
 
     it('should return 500 if conversation creation fails', async () => {

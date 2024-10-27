@@ -96,7 +96,7 @@ describe('POST /api/openai/chat', () => {
             .send({ catId: mockCatId, messages: mockMessages });
 
         expect(response.status).toBe(401);
-        expect(response.body.error).toBe('Invalid token');
+        expect(response.body.error).toBe('Invalid token. User not authenticated.');
     });
 });
 
