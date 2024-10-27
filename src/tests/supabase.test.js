@@ -940,12 +940,70 @@ describe('POST /api/supabase/conversations', () => {
         expect(res.body).toEqual({ conversation_id: mockConversation.id });
     });
 
-    // Add more tests for error cases
+    it('should return 401 for unauthenticated request', async () => {
+        const res = await request(app)
+            .post('/api/supabase/conversations');
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body.error).toBe('Authentication token is missing');
+    });
+
+    it('should return 401 for invalid token', async () => {
+        const res = await request(app)
+            .post('/api/supabase/conversations')
+            .set('Authorization', 'Bearer invalid_token');
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body.error).toBe('Invalid token');
+    });
+
+    it('should return 500 if conversation creation fails', async () => {
+        const userId = 36;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+
+        supabase.createConversation.mockRejectedValue(new Error('Database error'));
+
+        const res = await request(app)
+            .post('/api/supabase/conversations')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toBe(500);
+        expect(res.body.error).toBe('An error occurred while creating the conversation');
+    });
+
+    it('should return 400 if user already has maximum allowed conversations', async () => {
+        const userId = 36;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+
+        supabase.createConversation.mockResolvedValue({ error: 'Maximum number of conversations reached' });
+
+        const res = await request(app)
+            .post('/api/supabase/conversations')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.error).toBe('Maximum number of conversations reached');
+    });
+
+    it('should handle unexpected response from createConversation', async () => {
+        const userId = 36;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+
+        supabase.createConversation.mockResolvedValue(null);
+
+        const res = await request(app)
+            .post('/api/supabase/conversations')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toBe(500);
+        expect(res.body.error).toBe('An error occurred while creating the conversation');
+    });
 });
 
 describe('PUT /api/supabase/conversations/:id', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        supabase.updateConversation = jest.fn();
     });
 
     it('should update a conversation for authenticated user', async () => {
@@ -953,30 +1011,57 @@ describe('PUT /api/supabase/conversations/:id', () => {
         const conversationId = 8;
         const token = jwt.sign({ userId }, JWT_SECRET);
 
-        const mockUpdatedConversation = {
-            id: conversationId,
-            user_id: userId,
-            started_at: '2029-06-01T13:00:00Z',
-            messages: [
-                {
-                    role: 'user',
-                    content: 'Hello, how are you?'
-                }
-            ]
-        };
+        const mockUpdatedConversation = { success: true, message: "Conversation updated successfully" };
 
-        supabase.updateConversationById.mockResolvedValue(mockUpdatedConversation); // Ensure this is the correct mock
+        supabase.updateConversation.mockResolvedValue(mockUpdatedConversation);
 
         const res = await request(app)
             .put(`/api/supabase/conversations/${conversationId}`)
             .set('Authorization', `Bearer ${token}`)
-            .send({ started_at: '2029-06-01T13:00:00Z', messages: [{ role: 'user', content: 'Hello, how are you?' }] });
+            .send({ messages: [{ role: 'user', content: 'Hello, how are you?' }] });
 
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual(mockUpdatedConversation);
     });
 
-    // Add more tests for error cases
+    it('should return 400 if messages is not an array', async () => {
+        const userId = 36;
+        const conversationId = 8;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+
+        const res = await request(app)
+            .put(`/api/supabase/conversations/${conversationId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ messages: 'Not an array' });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors).toContain('"messages" must be an array');
+    });
+
+    it('should return 401 for unauthenticated request', async () => {
+        const conversationId = 8;
+
+        const res = await request(app)
+            .put(`/api/supabase/conversations/${conversationId}`)
+            .send({ messages: [{ role: 'user', content: 'Hello' }] });
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body.error).toBe('Authentication token is missing');
+    });
+
+    it('should return 400 for empty messages array', async () => {
+        const userId = 36;
+        const conversationId = 8;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+
+        const res = await request(app)
+            .put(`/api/supabase/conversations/${conversationId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ messages: [] });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors).toContain('"messages" must contain at least 1 items');
+    });
 });
 
 describe('DELETE /api/supabase/conversations/:id', () => {

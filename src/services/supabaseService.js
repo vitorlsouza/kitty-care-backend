@@ -277,20 +277,17 @@ const createNewConversation = async (userId, startedAt) => {
     }
 };
 
-const updateConversation = async (conversationId, userId, conversationData) => {
+const updateConversation = async (conversationId, userId, messages) => {
     try {
-        const { started_at, messages } = conversationData;
-
-        // update started_at
-        const updatedConversation = await updateConversationById(conversationId, userId, started_at);
-
-        // create messages
         for (const message of messages) {
             await createMessage(conversationId, userId, message.content, message.role);
         }
 
-        return updatedConversation;
+        return { success: true, message: "Conversation updated successfully" };
     } catch (error) {
+        if (error.message.includes("messages_conversation_id_fkey")) {
+            return null; // This will be caught in the controller and return a 404
+        }
         throw error;
     }
 };

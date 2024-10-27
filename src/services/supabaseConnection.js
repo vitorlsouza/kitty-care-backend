@@ -248,7 +248,10 @@ module.exports.createMessage = async (conversation_id, user_id, content, role) =
         .select()
         .single();
 
-    if (error) throw error;
+    if (error) {
+        console.error("Error in createMessage:", error);
+        throw error;
+    }
     return data;
 };
 

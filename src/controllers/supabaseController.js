@@ -295,7 +295,7 @@ const createConversation = async (req, res) => {
 const updateConversation = async (req, res) => {
     try {
         const { id } = req.params;
-        const { started_at, messages } = req.body;
+        const { messages } = req.body;
         const userId = req.user.userId;
 
         const errors = [];
@@ -307,7 +307,7 @@ const updateConversation = async (req, res) => {
             return res.status(400).json({ errors });
         }
 
-        const result = await supabaseService.updateConversation(id, userId, { started_at, messages });
+        const result = await supabaseService.updateConversation(id, userId, messages);
 
         if (!result) {
             return res.status(404).json({ error: 'Conversation not found or user not authorized' });
@@ -315,12 +315,14 @@ const updateConversation = async (req, res) => {
 
         res.status(200).json(result);
     } catch (error) {
-        console.error("Update conversation error:", error);
-        res.status(500).json({ error: "An error occurred while updating the conversation" });
+        if (error.message.includes("messages_conversation_id_fkey")) {
+            res.status(404).json({ error: "Conversation not found" });
+        } else {
+            console.error("Update conversation error:", error);
+            res.status(500).json({ error: "An error occurred while updating the conversation" });
+        }
     }
 };
-
-// Add these two new functions:
 
 const getAllConversations = async (req, res) => {
     try {
