@@ -215,7 +215,8 @@ const deleteCat = async (req, res) => {
 const getConversations = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const conversations = await supabaseService.getConversations(userId);
+        const conversationId = req.query.conversationId || null;
+        const conversations = await supabaseService.getConversations(userId, conversationId);
 
         if (conversations.message) {
             return res.status(404).json({ message: conversations.message });
@@ -332,5 +333,5 @@ module.exports = {
     postChatMessage,
     deleteConversation,
     createConversation,
-    updateConversation
+    updateConversation,
 };

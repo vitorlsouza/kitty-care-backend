@@ -21,6 +21,7 @@ router.delete('/cats/:id', authenticateToken, supabaseController.deleteCat);
 router.post('/chat', authenticateToken, validateChatMessage, supabaseController.postChatMessage);
 
 router.get('/conversations', authenticateToken, supabaseController.getConversations);
+router.get('/conversations/:id', authenticateToken, supabaseController.getConversations);
 router.post('/conversations', authenticateToken, supabaseController.createConversation);
 router.put('/conversations/:id', authenticateToken, validateUpdateConversation, supabaseController.updateConversation);
 router.delete('/conversations/:id', authenticateToken, supabaseController.deleteConversation);

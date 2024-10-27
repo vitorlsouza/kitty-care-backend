@@ -201,9 +201,9 @@ const deleteCat = async (catId, userId) => {
     };
 };
 
-const getConversations = async (userId) => {
+const getConversations = async (userId, conversationId = null) => {
     try {
-        const conversations = await getConversationsByUserId(userId);
+        const conversations = await getConversationsByUserId(userId, conversationId);
         return conversations.length > 0 ? conversations : { message: "No conversations found for this user." };
     } catch (error) {
         throw error;
