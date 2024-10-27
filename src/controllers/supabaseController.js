@@ -94,16 +94,18 @@ const createSubscription = async (req, res) => {
 const updateSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
+        const subscriptionId = req.params.id;
         const { plan, end_date } = req.body;
 
         const subscription = await supabaseService.updateSubscription(
+            subscriptionId,
             userId,
             plan,
             end_date
         );
         res.json(subscription);
     } catch (error) {
-        if (error.message === "Subscription not found or user not authorized") {
+        if (error.message === "Subscription not found") {
             res.status(404).json({ error: error.message });
         } else {
             console.error("Update subscription error:", error);

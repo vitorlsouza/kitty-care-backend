@@ -65,15 +65,16 @@ module.exports.createSubscriptionForUserId = async (userId, plan, endDate) => {
     return data;
 };
 
-module.exports.updateSubscriptionForUserId = async (userId, plan, endDate) => {
+module.exports.updateSubscriptionForUserId = async (subscriptionId, userId, plan, endDate) => {
     const { data, error } = await supabase
         .from('subscriptions')
         .update({ plan, end_date: endDate })
+        .eq('id', subscriptionId)
         .eq('user_id', userId)
         .select()
         .single();
 
-    if (error) throw error;
+    if (error) return null;
     return data;
 };
 

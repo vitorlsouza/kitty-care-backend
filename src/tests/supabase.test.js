@@ -320,7 +320,7 @@ describe('PUT /api/supabase/subscriptions/:id', () => {
             });
 
         expect(res.statusCode).toBe(404);
-        expect(res.body.error).toBe('Subscription not found or user not authorized');
+        expect(res.body.error).toBe('Subscription not found');
     });
 
     it('should return 400 for invalid input', async () => {

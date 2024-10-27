@@ -91,10 +91,10 @@ const createSubscription = async (userId, plan, endDate) => {
     return subscription;
 };
 
-const updateSubscription = async (userId, plan, endDate) => {
-    const subscription = await updateSubscriptionForUserId(userId, plan, endDate);
+const updateSubscription = async (subscriptionId, userId, plan, endDate) => {
+    const subscription = await updateSubscriptionForUserId(subscriptionId, userId, plan, endDate);
     if (!subscription) {
-        throw new Error("Subscription not found or user not authorized");
+        throw new Error("Subscription not found");
     }
     return subscription;
 };
