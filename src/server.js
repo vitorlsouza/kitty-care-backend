@@ -1,9 +1,12 @@
 // src/server.js
 const express = require('express');
+const cors = require('cors');
 const openaiRoutes = require('./routes/openaiRoutes');
 const supabaseRoutes = require('./routes/supabaseRoutes');
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/openai', openaiRoutes);
