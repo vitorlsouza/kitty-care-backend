@@ -159,10 +159,13 @@ const createCat = async (userId, catData) => {
     }
 };
 
-const uploadPhoto = async (photo, catId) => {
+const uploadPhoto = async (photo) => {
     try {
-        const uploadedPhoto = await uploadPhotoToSupabase(photo, catId);
-        return uploadedPhoto;
+        if (!photo) {
+            throw new Error('Invalid photo data');
+        }
+        const result = await uploadPhotoToSupabase(photo);
+        return result;
     } catch (error) {
         throw error;
     }
