@@ -63,9 +63,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "last_name": "Doe",
       "email": "john.doe@example.com",
       "password": "StrongPassword@123",
-      "trial_end_date": "2024-12-31",
       "phone_number": "1234567890",
-      "subscription_duration": "Monthly"
     }
     ```
 
@@ -74,9 +72,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
   - `last_name`: Required, string.
   - `email`: Required, must be a valid email format.
   - `password`: Required, minimum 8 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character (`@$!%*?&`).
-  - `trial_end_date`: Required, must be a valid ISO 8601 date.
   - `phone_number`: Optional, string.
-  - `subscription_duration`: Optional, must be either "Monthly" or "Yearly".
 
 - **Responses**:
   - **201 Created**:
@@ -96,8 +92,6 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
         "First name cannot be empty",
         "Invalid email format",
         "Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (@$!%*?&)",
-        "Trial end date must be a valid ISO 8601 date",
-        "Subscription duration must be either Monthly or Yearly"
       ]
     }
     ```
