@@ -21,7 +21,8 @@ const {
     deleteConversationById,
     getCatDetailsById,
     getConversationsByConversationId,
-    updateConversationById
+    updateConversationById,
+    uploadPhotoToSupabase
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
@@ -153,6 +154,15 @@ const createCat = async (userId, catData) => {
     try {
         const cat = await createCatByUserId(userId, catData);
         return cat;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const uploadPhoto = async (photo, catId) => {
+    try {
+        const uploadedPhoto = await uploadPhotoToSupabase(photo, catId);
+        return uploadedPhoto;
     } catch (error) {
         throw error;
     }
@@ -331,5 +341,6 @@ module.exports = {
     createNewConversation,
     updateConversation,
     createConversation,
-    getConversationByConversationId
+    getConversationByConversationId,
+    uploadPhoto
 };

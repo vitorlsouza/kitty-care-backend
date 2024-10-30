@@ -166,7 +166,7 @@ const getCats = async (req, res) => {
 const createCat = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const catData = req.body;
+        const { photo, ...catData } = req.body;
 
         const cat = await supabaseService.createCat(userId, catData);
 
@@ -176,7 +176,16 @@ const createCat = async (req, res) => {
             aiRecommendations
         );
 
-        res.status(201).json(updatedCat);
+        if (photo) {
+            const { data, error } = await supabaseService.uploadPhoto(photo, cat.id);
+            if (error) {
+                return res.status(500).json({ error: "An error occurred while uploading the photo" });
+            }
+            updatedCat.photo = data.url;
+        }
+        const finalCat = await supabaseService.updateCat(cat.id, userId, updatedCat);
+
+        res.status(201).json(finalCat);
     } catch (error) {
         console.error("Create cat error:", error);
         res.status(500).json({ error: "An error occurred while creating the cat" });
@@ -187,10 +196,19 @@ const updateCat = async (req, res) => {
     try {
         const userId = req.user.userId;
         const catId = req.params.id;
-        const catData = req.body;
+        const { photo, ...catData } = req.body;
 
         const updatedCat = await supabaseService.updateCat(catId, userId, catData);
-        res.json(updatedCat);
+        if (photo) {
+            const { data, error } = await supabaseService.uploadPhoto(photo, catId);
+            if (error) {
+                return res.status(500).json({ error: "An error occurred while uploading the photo" });
+            }
+            updatedCat.photo = data.url;
+        }
+        const finalUpdatedCat = await supabaseService.updateCat(catId, userId, updatedCat);
+
+        res.json(finalUpdatedCat);
     } catch (error) {
         console.error("Update cat error:", error);
         if (error.message === "Cat not found") {

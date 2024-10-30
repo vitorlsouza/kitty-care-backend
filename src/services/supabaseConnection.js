@@ -338,3 +338,37 @@ module.exports.updateConversationById = async (conversationId, userId, started_a
     if (error) throw error;
     return data;
 };
+
+module.exports.uploadPhotoToSupabase = async (photo, catId) => {
+    if (!photo) {
+        throw new Error('Invalid photo data');
+    }
+
+    try {
+        const fileExt = photo.originalname.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `cat-photos/${catId}/${fileName}`;
+
+        const { data, error } = await supabase.storage
+            .from('Cats')
+            .upload(filePath, photo.buffer, {
+                contentType: photo.mimetype,
+                upsert: false
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('Cats')
+            .getPublicUrl(filePath);
+
+        return {
+            path: filePath,
+            url: publicUrl
+        };
+    } catch (error) {
+        throw new Error(`Failed to upload photo: ${error.message}`);
+    }
+};
