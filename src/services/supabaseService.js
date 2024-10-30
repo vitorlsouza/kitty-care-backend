@@ -84,18 +84,18 @@ const getSubscription = async (userId) => {
     return subscription;
 };
 
-const createSubscription = async (userId, plan, endDate) => {
+const createSubscription = async (userId, plan, endDate, startDate) => {
     const hasExistingSubscription = await checkExistingSubscription(userId);
     if (hasExistingSubscription) {
         throw new Error("User already has a subscription");
     }
 
-    const subscription = await createSubscriptionForUserId(userId, plan, endDate);
+    const subscription = await createSubscriptionForUserId(userId, plan, endDate, startDate);
     return subscription;
 };
 
-const updateSubscription = async (subscriptionId, userId, plan, endDate) => {
-    const subscription = await updateSubscriptionForUserId(subscriptionId, userId, plan, endDate);
+const updateSubscription = async (subscriptionId, userId, plan, endDate, startDate) => {
+    const subscription = await updateSubscriptionForUserId(subscriptionId, userId, plan, endDate, startDate);
     if (!subscription) {
         throw new Error("Subscription not found");
     }

@@ -74,6 +74,11 @@ const createSubscriptionSchema = Joi.object({
         'date.required': 'End date is required',
         'date.format': 'End date must be a valid ISO 8601 date',
         'date.greater': 'End date must be in the future'
+    }),
+    start_date: Joi.date().iso().required().greater('now').messages({
+        'date.required': 'Start date is required',
+        'date.format': 'Start date must be a valid ISO 8601 date',
+        'date.greater': 'Start date must be in the future'
     })
 });
 
@@ -89,9 +94,10 @@ const validateCreateSubscription = (req, res, next) => {
 const updateSubscriptionSchema = Joi.object(
     {
         plan: Joi.string().valid(...Object.values(PLANS)),
-        end_date: Joi.date().iso().greater('now')
+        end_date: Joi.date().iso().greater('now'),
+        start_date: Joi.date().iso()
     }
-).or('plan', 'end_date').messages({
+).or('plan', 'end_date', 'start_date').messages({
     'object.missing': 'At least one of plan or end_date must be provided'
 });
 

@@ -74,12 +74,13 @@ const getSubscription = async (req, res) => {
 const createSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { plan, end_date } = req.body;
+        const { plan, end_date, start_date } = req.body;
 
         const subscription = await supabaseService.createSubscription(
             userId,
             plan,
-            end_date
+            end_date,
+            start_date
         );
         res.status(201).json(subscription);
     } catch (error) {
@@ -98,13 +99,14 @@ const updateSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
         const subscriptionId = req.params.id;
-        const { plan, end_date } = req.body;
+        const { plan, end_date, start_date } = req.body;
 
         const subscription = await supabaseService.updateSubscription(
             subscriptionId,
             userId,
             plan,
-            end_date
+            end_date,
+            start_date
         );
         res.json(subscription);
     } catch (error) {

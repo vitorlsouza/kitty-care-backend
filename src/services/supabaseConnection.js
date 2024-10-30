@@ -53,13 +53,14 @@ module.exports.checkExistingSubscription = async (userId) => {
     return data !== null;
 };
 
-module.exports.createSubscriptionForUserId = async (userId, plan, endDate) => {
+module.exports.createSubscriptionForUserId = async (userId, plan, endDate, startDate) => {
     const { data, error } = await supabase
         .from('subscriptions')
         .insert({
             user_id: userId,
             plan: plan,
-            end_date: endDate
+            end_date: endDate,
+            start_date: startDate
         })
         .select()
         .single();
@@ -68,10 +69,10 @@ module.exports.createSubscriptionForUserId = async (userId, plan, endDate) => {
     return data;
 };
 
-module.exports.updateSubscriptionForUserId = async (subscriptionId, userId, plan, endDate) => {
+module.exports.updateSubscriptionForUserId = async (subscriptionId, userId, plan, endDate, startDate) => {
     const { data, error } = await supabase
         .from('subscriptions')
-        .update({ plan, end_date: endDate })
+        .update({ plan, end_date: endDate, start_date: startDate })
         .eq('id', subscriptionId)
         .eq('user_id', userId)
         .select()
