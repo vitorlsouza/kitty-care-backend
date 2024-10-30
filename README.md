@@ -62,7 +62,10 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "first_name": "John",
       "last_name": "Doe",
       "email": "john.doe@example.com",
-      "password": "StrongPassword@123"
+      "password": "StrongPassword@123",
+      "trial_end_date": "2024-12-31",
+      "phone_number": "1234567890",
+      "subscription_duration": "Monthly"
     }
     ```
 
@@ -71,6 +74,9 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
   - `last_name`: Required, string.
   - `email`: Required, must be a valid email format.
   - `password`: Required, minimum 8 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character (`@$!%*?&`).
+  - `trial_end_date`: Required, must be a valid ISO 8601 date.
+  - `phone_number`: Optional, string.
+  - `subscription_duration`: Optional, must be either "Monthly" or "Yearly".
 
 - **Responses**:
   - **201 Created**:
@@ -89,7 +95,9 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "errors": [
         "First name cannot be empty",
         "Invalid email format",
-        "Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (@$!%*?&)"
+        "Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (@$!%*?&)",
+        "Trial end date must be a valid ISO 8601 date",
+        "Subscription duration must be either Monthly or Yearly"
       ]
     }
     ```
@@ -223,13 +231,15 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     ```json
     {
       "plan": "Basic",
-      "end_date": "2023-12-31"
+      "end_date": "2023-12-31",
+      "start_date": "2023-01-01"
     }
     ```
 
 - **Validation Rules**:
   - `plan`: Required, must be one of the predefined plans (`Basic`, `Premium`).
   - `end_date`: Required, must be a valid ISO 8601 date in the future.
+  - `start_date`: Required, must be a valid ISO 8601 date in the future.
 
 - **Responses**:
   - **201 Created**:
@@ -258,7 +268,8 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "errors": [
         "Plan is required",
         "Plan must be one of: Basic, Premium",
-        "End date must be in the future"
+        "End date must be in the future",
+        "Start date must be in the future"
       ]
     }
     ```
@@ -452,6 +463,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     {
       "name": "Whiskers",
       "goal": "Weight Management",
+      "photo": "base64_encoded_string",
       "issues_faced": "None",
       "activity_level": "Active",
       "gender": "Male",
@@ -475,17 +487,18 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
 - **Validation Rules**:
   - `name`: Required, string.
   - `goal`: Required, string.
+  - `photo`: Optional, string (base64 encoded).
   - `issues_faced`: Optional, string.
   - `activity_level`: Required, string.
-  - `gender`: Required, must be either `Male` or `Female`.
-  - `age`: Required, integer.
+  - `gender`: Required, must be either "Male" or "Female".
+  - `age`: Required, must be an integer.
   - `country`: Required, string.
   - `zipcode`: Required, string.
   - `breed`: Required, string.
-  - `weight`: Required, positive number.
-  - `target_weight`: Required, positive number.
+  - `weight`: Required, must be a positive number.
+  - `target_weight`: Required, must be a positive number.
   - `required_progress`: Required, string.
-  - `check_in_period`: Required, must be one of `Daily`, `Weekly`, `Bi-weekly`, `Monthly`.
+  - `check_in_period`: Required, must be one of: "Daily", "Weekly", "Bi-weekly", "Monthly".
   - `training_days`: Required, string.
   - `medical_conditions`: Optional, string.
   - `medications`: Optional, string.
@@ -926,14 +939,14 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     {
       "conversation_id": 1,
       "content": "Hello, how are you?",
-      "role": "user" // or "assistant"
+      "role": "user"
     }
     ```
 
 - **Validation Rules**:
   - `conversation_id`: Required, integer.
   - `content`: Required, string.
-  - `role`: Required, must be either `user` or `assistant`.
+  - `role`: Required, must be either "user" or "assistant".
 
 - **Responses**:
   - **201 Created**:
