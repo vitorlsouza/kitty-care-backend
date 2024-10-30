@@ -31,7 +31,10 @@ const signupSchema = Joi.object({
     }),
     password: Joi.string().pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'))
         .message('Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (@$!%*?&)')
-        .required()
+        .required(),
+    trial_end_date: Joi.date().iso().required(),
+    phone_number: Joi.string().optional(),
+    subscription_duration: Joi.string().valid('Monthly', 'Yearly').optional()
 });
 
 const validateSignup = (req, res, next) => {
