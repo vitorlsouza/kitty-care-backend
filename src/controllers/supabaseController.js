@@ -2,14 +2,17 @@ const supabaseService = require("../services/supabaseService");
 const openaiService = require("../services/openaiService");
 
 const signup = async (req, res) => {
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, password, trial_end_date, phone_number, subscription_duration } = req.body;
 
     try {
         const { token, expiresIn } = await supabaseService.signupUser(
             first_name,
             last_name,
             email,
-            password
+            password,
+            trial_end_date,
+            phone_number,
+            subscription_duration
         );
         res.status(201).json({ token, expiresIn });
     } catch (error) {

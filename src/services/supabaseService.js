@@ -26,7 +26,7 @@ const {
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
 
-const signupUser = async (first_name, last_name, email, password) => {
+const signupUser = async (first_name, last_name, email, password, trial_end_date, phone_number, subscription_duration) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
@@ -34,7 +34,10 @@ const signupUser = async (first_name, last_name, email, password) => {
             first_name,
             last_name,
             email,
-            hashedPassword
+            hashedPassword,
+            trial_end_date,
+            phone_number,
+            subscription_duration
         );
         if (!user) {
             throw new Error("Failed to create user");

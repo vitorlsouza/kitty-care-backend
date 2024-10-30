@@ -5,12 +5,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 module.exports = supabase;
 
-module.exports.createUserInDatabase = async (first_name, last_name, email, hashedPassword) => {
+module.exports.createUserInDatabase = async (first_name, last_name, email, hashedPassword, trial_end_date, phone_number = null, subscription_duration = null) => {
     const { data, error } = await supabase.from('users').insert({
         first_name: first_name,
         last_name: last_name,
         email: email,
-        password: hashedPassword
+        password: hashedPassword,
+        trial_end_date: trial_end_date,
+        phone_number: phone_number,
+        subscription_duration: subscription_duration
     }).select().single();
 
     if (error) throw error;
