@@ -17,19 +17,19 @@ const signup = async (req, res) => {
         if (error instanceof Error) {
             console.log(error.message);
             if (error.message === "Email already exists") {
-                res.status(409).json({ error: "Email already in use" });
+                res.status(409).json({ message: "Email already in use" });
             } else if (
                 error.message === "Invalid email format" ||
                 error.message.startsWith("Password must be")
             ) {
-                res.status(400).json({ error: error.message });
+                res.status(400).json({ message: error.message });
             } else {
                 console.error(error);
-                res.status(500).json({ error: "An unexpected error occurred" });
+                res.status(500).json({ message: "An unexpected error occurred" });
             }
         } else {
             console.error(error);
-            res.status(500).json({ error: "An unexpected error occurred" });
+            res.status(500).json({ message: "An unexpected error occurred" });
         }
     }
 };
@@ -41,13 +41,13 @@ const signin = async (req, res) => {
 
         if (result.error) {
             // Return the specific error to the client
-            return res.status(401).json({ error: `${result.error}` });
+            return res.status(401).json({ message: `${result.error}` });
         }
 
         res.json(result);
     } catch (error) {
         console.error("Signin error:", error);
-        res.status(500).json({ error: "An error occurred during signin" });
+        res.status(500).json({ message: "An error occurred during signin" });
     }
 };
 
@@ -65,7 +65,7 @@ const getSubscription = async (req, res) => {
         console.error("Get subscription error:", error);
         res
             .status(500)
-            .json({ error: "An error occurred while fetching the subscription" });
+            .json({ message: "An error occurred while fetching the subscription" });
     }
 };
 
@@ -77,13 +77,13 @@ const createSubscription = async (req, res) => {
         const result = await supabaseService.createSubscription(userId, plan, end_date, start_date, provider, billing_period);
 
         if (!result.success) {
-            return res.status(400).json({ error: result.error });
+            return res.status(400).json({ message: result.error });
         }
 
         res.status(201).json(result.data);
     } catch (error) {
         console.error("Create subscription error:", error);
-        res.status(500).json({ error: "An error occurred while creating the subscription" });
+        res.status(500).json({ message: "An error occurred while creating the subscription" });
     }
 };
 
@@ -105,12 +105,12 @@ const updateSubscription = async (req, res) => {
         res.json(subscription);
     } catch (error) {
         if (error.message === "Subscription not found") {
-            res.status(404).json({ error: error.message });
+            res.status(404).json({ message: error.message });
         } else {
             console.error("Update subscription error:", error);
             res
                 .status(500)
-                .json({ error: "An error occurred while updating the subscription" });
+                .json({ message: "An error occurred while updating the subscription" });
         }
     }
 };
@@ -130,11 +130,11 @@ const deleteSubscription = async (req, res) => {
     } catch (error) {
         console.error("Error in deleteSubscription controller:", error);
         if (error.message === "Subscription not found") {
-            res.status(404).json({ error: "Subscription not found" });
+            res.status(404).json({ message: "Subscription not found" });
         } else {
             res
                 .status(500)
-                .json({ error: "An error occurred while deleting the subscription" });
+                .json({ message: "An error occurred while deleting the subscription" });
         }
     }
 };
@@ -153,7 +153,7 @@ const getCats = async (req, res) => {
         console.error("Get cats error:", error);
         res
             .status(500)
-            .json({ error: "An error occurred while fetching the cats" });
+            .json({ message: "An error occurred while fetching the cats" });
     }
 };
 
@@ -173,7 +173,7 @@ const createCat = async (req, res) => {
         if (photo) {
             const { data, error } = await supabaseService.uploadPhoto(photo, cat.id);
             if (error) {
-                return res.status(500).json({ error: "An error occurred while uploading the photo" });
+                return res.status(500).json({ message: "An error occurred while uploading the photo" });
             }
             updatedCat.photo = data.url;
         }
@@ -182,7 +182,7 @@ const createCat = async (req, res) => {
         res.status(201).json(finalCat);
     } catch (error) {
         console.error("Create cat error:", error);
-        res.status(500).json({ error: "An error occurred while creating the cat" });
+        res.status(500).json({ message: "An error occurred while creating the cat" });
     }
 };
 
@@ -196,7 +196,7 @@ const updateCat = async (req, res) => {
         if (photo) {
             const { data, error } = await supabaseService.uploadPhoto(photo, catId);
             if (error) {
-                return res.status(500).json({ error: "An error occurred while uploading the photo" });
+                return res.status(500).json({ message: "An error occurred while uploading the photo" });
             }
             updatedCat.photo = data.url;
         }
@@ -206,9 +206,9 @@ const updateCat = async (req, res) => {
     } catch (error) {
         console.error("Update cat error:", error);
         if (error.message === "Cat not found") {
-            res.status(404).json({ error: error.message });
+            res.status(404).json({ message: error.message });
         } else {
-            res.status(500).json({ error: "An error occurred while updating the cat" });
+            res.status(500).json({ message: "An error occurred while updating the cat" });
         }
     }
 };
@@ -227,7 +227,7 @@ const deleteCat = async (req, res) => {
         res.status(200).json({ message: result.message });
     } catch (error) {
         console.error("Delete cat error:", error);
-        res.status(500).json({ error: "An error occurred while deleting the cat" });
+        res.status(500).json({ message: "An error occurred while deleting the cat" });
     }
 };
 
@@ -244,7 +244,7 @@ const getConversations = async (req, res) => {
         res.status(200).json(conversations);
     } catch (error) {
         console.error("Get conversations error:", error);
-        res.status(500).json({ error: "An error occurred while fetching the conversations" });
+        res.status(500).json({ message: "An error occurred while fetching the conversations" });
     }
 };
 
@@ -256,7 +256,7 @@ const postChatMessage = async (req, res) => {
         // Check if the user exists
         const userExists = await supabaseService.checkUserExists(user_id);
         if (!userExists) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ message: 'User not found' });
         }
 
         const result = await supabaseService.handleChatMessage(conversation_id, user_id, content, role);
@@ -265,10 +265,10 @@ const postChatMessage = async (req, res) => {
     } catch (error) {
         console.error("Post chat message error:", error);
         if (error.message === "Conversation not found") {
-            res.status(404).json({ error: error.message });
+            res.status(404).json({ message: error.message });
         } else {
             // Change this line to return 500 for unexpected errors
-            res.status(500).json({ error: 'An error occurred while processing the chat message' });
+            res.status(500).json({ message: 'An error occurred while processing the chat message' });
         }
     }
 };
@@ -281,13 +281,13 @@ const deleteConversation = async (req, res) => {
         const result = await supabaseService.deleteConversation(conversationId, userId);
 
         if (!result.success) {
-            return res.status(result.status).json({ error: result.error });
+            return res.status(result.status).json({ message: result.error });
         }
 
         res.status(200).json({ message: result.message });
     } catch (error) {
         console.error("Delete conversation error:", error);
-        res.status(500).json({ error: "An error occurred while deleting the conversation" });
+        res.status(500).json({ message: "An error occurred while deleting the conversation" });
     }
 };
 
@@ -299,13 +299,13 @@ const createConversation = async (req, res) => {
         const result = await supabaseService.createConversation(userId, started_at);
 
         if (result.error) {
-            return res.status(400).json({ error: result.error });
+            return res.status(400).json({ message: result.error });
         }
 
         res.status(201).json({ id: result.id });
     } catch (error) {
         console.error("Create conversation error:", error);
-        res.status(500).json({ error: "An error occurred while creating the conversation" });
+        res.status(500).json({ message: "An error occurred while creating the conversation" });
     }
 };
 
@@ -327,16 +327,16 @@ const updateConversation = async (req, res) => {
         const result = await supabaseService.updateConversation(id, userId, messages);
 
         if (!result) {
-            return res.status(404).json({ error: 'Conversation not found' });
+            return res.status(404).json({ message: 'Conversation not found' });
         }
 
         res.status(200).json(result);
     } catch (error) {
         if (error.message.includes("messages_conversation_id_fkey")) {
-            res.status(404).json({ error: "Conversation not found" });
+            res.status(404).json({ message: "Conversation not found" });
         } else {
             console.error("Update conversation error:", error);
-            res.status(500).json({ error: "An error occurred while updating the conversation" });
+            res.status(500).json({ message: "An error occurred while updating the conversation" });
         }
     }
 };
@@ -353,7 +353,7 @@ const getAllConversations = async (req, res) => {
         res.status(200).json(conversations);
     } catch (error) {
         console.error("Get all conversations error:", error);
-        res.status(500).json({ error: "An error occurred while fetching the conversations" });
+        res.status(500).json({ message: "An error occurred while fetching the conversations" });
     }
 };
 
@@ -370,7 +370,7 @@ const getConversationByConversationId = async (req, res) => {
         res.status(200).json(conversation);
     } catch (error) {
         console.error("Get conversation by ID error:", error);
-        res.status(500).json({ error: "An error occurred while fetching the conversation" });
+        res.status(500).json({ message: "An error occurred while fetching the conversation" });
     }
 };
 

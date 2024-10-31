@@ -49,7 +49,7 @@ describe('POST /api/openai/chat', () => {
             .send({ catId: mockCatId, messages: mockMessages });
 
         expect(response.status).toBe(401);
-        expect(response.body.error).toBe('Authentication token is missing');
+        expect(response.body.message).toBe('Authentication token is missing');
     });
 
     it('should return 400 if messages are not a non-empty array', async () => {
@@ -60,7 +60,7 @@ describe('POST /api/openai/chat', () => {
             .send({ catId: mockCatId, messages: [] });
 
         expect(response.status).toBe(400);
-        expect(response.body.error).toBe('Messages must be a non-empty array');
+        expect(response.body.message).toBe('Messages must be a non-empty array');
     });
 
     it('should return 404 if cat is not found', async () => {
@@ -73,7 +73,7 @@ describe('POST /api/openai/chat', () => {
             .send({ catId: mockCatId, messages: mockMessages });
 
         expect(response.status).toBe(404);
-        expect(response.body.error).toBe('Cat not found');
+        expect(response.body.message).toBe('Cat not found');
     });
 
     it('should return 500 if an error occurs', async () => {
@@ -86,7 +86,7 @@ describe('POST /api/openai/chat', () => {
             .send({ catId: mockCatId, messages: mockMessages });
 
         expect(response.status).toBe(500);
-        expect(response.body.error).toBe('An error occurred while processing the request');
+        expect(response.body.message).toBe('An error occurred while processing the request');
     });
 
     it('should return 401 if token is invalid', async () => {
@@ -96,7 +96,7 @@ describe('POST /api/openai/chat', () => {
             .send({ catId: mockCatId, messages: mockMessages });
 
         expect(response.status).toBe(401);
-        expect(response.body.error).toBe('Invalid token. User not authenticated.');
+        expect(response.body.message).toBe('Invalid token. User not authenticated.');
     });
 });
 

@@ -45,9 +45,9 @@ describe('POST /api/supabase/signup', () => {
 
         expect(res.statusCode).toBe(400);
         expect(res.body).toHaveProperty('errors');
-        expect(res.body.errors).toContain('First name cannot be empty');
-        expect(res.body.errors).toContain('Invalid email format');
-        expect(res.body.errors[2]).toMatch(/Password must be at least 8 characters long/);
+        expect(res.body.messages).toContain('First name cannot be empty');
+        expect(res.body.messages).toContain('Invalid email format');
+        expect(res.body.messages[2]).toMatch(/Password must be at least 8 characters long/);
     });
 
     it('should return 409 for existing email', async () => {
@@ -63,7 +63,7 @@ describe('POST /api/supabase/signup', () => {
             });
 
         expect(res.statusCode).toBe(409);
-        expect(res.body.error).toBe('Email already in use');
+        expect(res.body.message).toBe('Email already in use');
     });
 
     it('should return 500 for unexpected errors', async () => {
@@ -79,7 +79,7 @@ describe('POST /api/supabase/signup', () => {
             });
 
         expect(res.statusCode).toBe(500);
-        expect(res.body.error).toBe('An unexpected error occurred');
+        expect(res.body.message).toBe('An unexpected error occurred');
     });
 });
 
@@ -119,7 +119,7 @@ describe('POST /api/supabase/signin', () => {
             });
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.error).toBe('User not found');
+        expect(res.body.message).toBe('User not found');
     });
 
     it('should return 401 for incorrect password', async () => {
@@ -138,7 +138,7 @@ describe('POST /api/supabase/signin', () => {
             });
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.error).toBe('Incorrect password');
+        expect(res.body.message).toBe('Incorrect password');
     });
 
     it('should return 400 for invalid input', async () => {
@@ -151,8 +151,8 @@ describe('POST /api/supabase/signin', () => {
 
         expect(res.statusCode).toBe(400);
         expect(res.body).toHaveProperty('errors');
-        expect(res.body.errors).toContain('Invalid email format');
-        expect(res.body.errors).toContain("\"password\" is not allowed to be empty");
+        expect(res.body.messages).toContain('Invalid email format');
+        expect(res.body.messages).toContain("\"password\" is not allowed to be empty");
     });
 });
 
@@ -257,7 +257,7 @@ describe('POST /api/supabase/subscriptions', () => {
             });
 
         expect(res.statusCode).toBe(400);
-        expect(res.body.error).toBe('User already has a subscription');
+        expect(res.body.message).toBe('User already has a subscription');
     });
 
     it('should return 400 for invalid input', async () => {
@@ -347,7 +347,7 @@ describe('PUT /api/supabase/subscriptions/:id', () => {
             });
 
         expect(res.statusCode).toBe(404);
-        expect(res.body.error).toBe('Subscription not found');
+        expect(res.body.message).toBe('Subscription not found');
     });
 
     it('should return 400 for invalid input', async () => {
@@ -417,7 +417,7 @@ describe('DELETE /api/supabase/subscriptions/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(404);
-        expect(res.body.error).toBe('Subscription not found');
+        expect(res.body.message).toBe('Subscription not found');
     });
 
     it('should return 403 if user not authorized to delete subscription', async () => {
@@ -432,7 +432,7 @@ describe('DELETE /api/supabase/subscriptions/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(403);
-        expect(res.body.error).toBe('User not authorized to delete this subscription');
+        expect(res.body.message).toBe('User not authorized to delete this subscription');
     });
 
     it('should return 401 for unauthenticated request', async () => {
@@ -456,7 +456,7 @@ describe('DELETE /api/supabase/subscriptions/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
-        expect(res.body.error).toBe('An error occurred while deleting the subscription');
+        expect(res.body.message).toBe('An error occurred while deleting the subscription');
     });
 });
 
@@ -585,16 +585,16 @@ describe('POST /api/supabase/cats', () => {
 
         expect(res.statusCode).toBe(400);
         expect(res.body).toHaveProperty('errors');
-        expect(res.body.errors).toContain('"name" is not allowed to be empty');
-        expect(res.body.errors).toContain('Age must be a number');
-        expect(res.body.errors).toContain('Goal is required');
-        expect(res.body.errors).toContain('Activity level is required');
-        expect(res.body.errors).toContain('Gender is required');
-        expect(res.body.errors).toContain('Country is required');
-        expect(res.body.errors).toContain('Zipcode is required');
-        expect(res.body.errors).toContain('Weight is required');
-        expect(res.body.errors).toContain('Target weight is required');
-        expect(res.body.errors).toContain('Required progress is required');
+        expect(res.body.messages).toContain('"name" is not allowed to be empty');
+        expect(res.body.messages).toContain('Age must be a number');
+        expect(res.body.messages).toContain('Goal is required');
+        expect(res.body.messages).toContain('Activity level is required');
+        expect(res.body.messages).toContain('Gender is required');
+        expect(res.body.messages).toContain('Country is required');
+        expect(res.body.messages).toContain('Zipcode is required');
+        expect(res.body.messages).toContain('Weight is required');
+        expect(res.body.messages).toContain('Target weight is required');
+        expect(res.body.messages).toContain('Required progress is required');
     });
 
     it('should return 401 for unauthenticated request', async () => {
@@ -748,7 +748,7 @@ describe('PUT /api/supabase/cats/:id', () => {
             });
 
         expect(res.statusCode).toBe(404);
-        expect(res.body.error).toBe('Cat not found');
+        expect(res.body.message).toBe('Cat not found');
     });
 
     it('should return 400 for invalid input', async () => {
@@ -766,8 +766,8 @@ describe('PUT /api/supabase/cats/:id', () => {
 
         expect(res.statusCode).toBe(400);
         expect(res.body).toHaveProperty('errors');
-        expect(res.body.errors).toContain('"name" is not allowed to be empty');
-        expect(res.body.errors).toContain('"age" must be a number');
+        expect(res.body.messages).toContain('"name" is not allowed to be empty');
+        expect(res.body.messages).toContain('"age" must be a number');
     });
 
     it('should return 401 for unauthenticated request', async () => {
@@ -836,7 +836,7 @@ describe('DELETE /api/supabase/cats/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(404);
-        expect(res.body.error).toBe('Cat not found');
+        expect(res.body.message).toBe('Cat not found');
     });
 
     it('should return 403 if user not authorized to delete cat', async () => {
@@ -851,7 +851,7 @@ describe('DELETE /api/supabase/cats/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(403);
-        expect(res.body.error).toBe('User not authorized to delete this cat');
+        expect(res.body.message).toBe('User not authorized to delete this cat');
     });
 
     it('should return 401 for unauthenticated request', async () => {
@@ -875,7 +875,7 @@ describe('DELETE /api/supabase/cats/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
-        expect(res.body.error).toBe('An error occurred while deleting the cat');
+        expect(res.body.message).toBe('An error occurred while deleting the cat');
     });
 });
 
@@ -978,7 +978,7 @@ describe('POST /api/supabase/conversations', () => {
             .post('/api/supabase/conversations');
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.error).toBe('Authentication token is missing');
+        expect(res.body.message).toBe('Authentication token is missing');
     });
 
     it('should return 401 for invalid token', async () => {
@@ -987,7 +987,7 @@ describe('POST /api/supabase/conversations', () => {
             .set('Authorization', 'Bearer invalid_token');
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.error).toBe('Invalid token. User not authenticated.');
+        expect(res.body.message).toBe('Invalid token. User not authenticated.');
     });
 
     it('should return 500 if conversation creation fails', async () => {
@@ -1001,7 +1001,7 @@ describe('POST /api/supabase/conversations', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
-        expect(res.body.error).toBe('An error occurred while creating the conversation');
+        expect(res.body.message).toBe('An error occurred while creating the conversation');
     });
 
     it('should return 400 if user already has maximum allowed conversations', async () => {
@@ -1015,7 +1015,7 @@ describe('POST /api/supabase/conversations', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(400);
-        expect(res.body.error).toBe('Maximum number of conversations reached');
+        expect(res.body.message).toBe('Maximum number of conversations reached');
     });
 
     it('should handle unexpected response from createConversation', async () => {
@@ -1029,7 +1029,7 @@ describe('POST /api/supabase/conversations', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
-        expect(res.body.error).toBe('An error occurred while creating the conversation');
+        expect(res.body.message).toBe('An error occurred while creating the conversation');
     });
 });
 
@@ -1068,7 +1068,7 @@ describe('PUT /api/supabase/conversations/:id', () => {
             .send({ messages: 'Not an array' });
 
         expect(res.statusCode).toBe(400);
-        expect(res.body.errors).toContain('"messages" must be an array');
+        expect(res.body.messages).toContain('"messages" must be an array');
     });
 
     it('should return 401 for unauthenticated request', async () => {
@@ -1079,7 +1079,7 @@ describe('PUT /api/supabase/conversations/:id', () => {
             .send({ messages: [{ role: 'user', content: 'Hello' }] });
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.error).toBe('Authentication token is missing');
+        expect(res.body.message).toBe('Authentication token is missing');
     });
 
     it('should return 400 for empty messages array', async () => {
@@ -1093,7 +1093,7 @@ describe('PUT /api/supabase/conversations/:id', () => {
             .send({ messages: [] });
 
         expect(res.statusCode).toBe(400);
-        expect(res.body.errors).toContain('"messages" must contain at least 1 items');
+        expect(res.body.messages).toContain('"messages" must contain at least 1 items');
     });
 });
 
@@ -1130,7 +1130,7 @@ describe('DELETE /api/supabase/conversations/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(404);
-        expect(res.body.error).toBe('Conversation not found');
+        expect(res.body.message).toBe('Conversation not found');
     });
 
     it('should return 403 if user not authorized to delete conversation', async () => {
@@ -1145,7 +1145,7 @@ describe('DELETE /api/supabase/conversations/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(403);
-        expect(res.body.error).toBe('User not authorized to delete this conversation');
+        expect(res.body.message).toBe('User not authorized to delete this conversation');
     });
 
     it('should return 401 for unauthenticated request', async () => {
@@ -1169,6 +1169,6 @@ describe('DELETE /api/supabase/conversations/:id', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
-        expect(res.body.error).toBe('An error occurred while deleting the conversation');
+        expect(res.body.message).toBe('An error occurred while deleting the conversation');
     });
 });

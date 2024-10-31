@@ -19,9 +19,9 @@ exports.chat = async (req, res) => {
         res.status(200).json({ message: response });
     } catch (error) {
         if (error.code === 'PGRST116') {
-            return res.status(404).json({ error: 'Cat not found' });
+            return res.status(404).json({ message: 'Cat not found' });
         }
         console.error('Error in chat controller:', error);
-        res.status(500).json({ error: 'An error occurred while processing the request' });
+        res.status(500).json({ message: 'An error occurred while processing the request' });
     }
 };
