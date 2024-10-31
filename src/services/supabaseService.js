@@ -42,7 +42,7 @@ const signupUser = async (first_name, last_name, email, password, phone_number) 
             throw new Error("Failed to create user");
         }
 
-        const expiresIn = "1h";
+        const expiresIn = "1d";
         const token = jwt.sign({ userId: user.ID }, JWT_SECRET, { expiresIn });
 
         return { token, expiresIn }; // Return token and expiresIn directly
@@ -69,7 +69,7 @@ const signinUser = async (email, password) => {
         return { error: "Incorrect password" };
     }
 
-    const expiresIn = "1h";
+    const expiresIn = "1d";
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn });
 
     return { token, expiresIn };

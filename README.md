@@ -80,7 +80,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     ```json
     {
       "token": "<JWT Token>",
-      "expiresIn": "1h"
+      "expiresIn": "1d"
     }
     ```
 
@@ -136,7 +136,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     ```json
     {
       "token": "<JWT Token>",
-      "expiresIn": "1h"
+      "expiresIn": "1d"
     }
     ```
 
