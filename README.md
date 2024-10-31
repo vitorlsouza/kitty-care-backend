@@ -189,7 +189,10 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     {
       "id": 1,
       "plan": "Basic",
-      "end_date": "2023-12-31"
+      "end_date": "2023-12-31",
+      "start_date": "2023-01-01",
+      "provider": "PayPal",
+      "billing_period": "Monthly"
     }
     ```
 
@@ -226,7 +229,9 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     {
       "plan": "Basic",
       "end_date": "2023-12-31",
-      "start_date": "2023-01-01"
+      "start_date": "2023-01-01",
+      "provider": "PayPal",
+      "billing_period": "Monthly"
     }
     ```
 
@@ -243,7 +248,10 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "id": 1,
       "user_id": 1,
       "plan": "Basic",
-      "end_date": "2023-12-31"
+      "end_date": "2023-12-31",
+      "start_date": "2023-01-01",
+      "provider": "PayPal",
+      "billing_period": "Monthly"
     }
     ```
 
@@ -263,7 +271,11 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
         "Plan is required",
         "Plan must be one of: Basic, Premium",
         "End date must be in the future",
-        "Start date must be in the future"
+        "Start date must be in the future",
+        "Provider is required",
+        "Provider must be either PayPal or Stripe",
+        "Billing period is required",
+        "Billing period must be either Monthly or Yearly"
       ]
     }
     ```
@@ -295,7 +307,10 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
     ```json
     {
       "plan": "Premium",
-      "end_date": "2024-12-31"
+      "end_date": "2024-12-31",
+      "start_date": "2024-01-01",
+      "provider": "PayPal",
+      "billing_period": "Monthly"
     }
     ```
 
@@ -312,7 +327,10 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "id": 1,
       "user_id": 1,
       "plan": "Premium",
-      "end_date": "2024-12-31"
+      "end_date": "2024-12-31",
+      "start_date": "2024-01-01",
+      "provider": "PayPal",
+      "billing_period": "Monthly"
     }
     ```
 
@@ -323,7 +341,12 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "errors": [
         "At least one of plan or end_date must be provided",
         "Plan must be one of: Basic, Premium",
-        "End date must be in the future"
+        "End date must be in the future",
+        "Start date must be in the future",
+        "Provider is required",
+        "Provider must be either PayPal or Stripe",
+        "Billing period is required",
+        "Billing period must be either Monthly or Yearly"
       ]
     }
     ```

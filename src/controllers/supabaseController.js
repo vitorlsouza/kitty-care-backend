@@ -72,24 +72,18 @@ const getSubscription = async (req, res) => {
 const createSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { plan, end_date, start_date } = req.body;
+        const { plan, end_date, start_date, provider, billing_period } = req.body;
 
-        const subscription = await supabaseService.createSubscription(
-            userId,
-            plan,
-            end_date,
-            start_date
-        );
-        res.status(201).json(subscription);
-    } catch (error) {
-        if (error.message === "User already has a subscription") {
-            res.status(400).json({ error: error.message });
-        } else {
-            console.error("Create subscription error:", error);
-            res
-                .status(500)
-                .json({ error: "An error occurred while creating the subscription" });
+        const result = await supabaseService.createSubscription(userId, plan, end_date, start_date, provider, billing_period);
+
+        if (!result.success) {
+            return res.status(400).json({ error: result.error });
         }
+
+        res.status(201).json(result.data);
+    } catch (error) {
+        console.error("Create subscription error:", error);
+        res.status(500).json({ error: "An error occurred while creating the subscription" });
     }
 };
 
@@ -97,14 +91,16 @@ const updateSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
         const subscriptionId = req.params.id;
-        const { plan, end_date, start_date } = req.body;
+        const { plan, end_date, start_date, provider, billing_period } = req.body;
 
         const subscription = await supabaseService.updateSubscription(
             subscriptionId,
             userId,
             plan,
             end_date,
-            start_date
+            start_date,
+            provider,
+            billing_period
         );
         res.json(subscription);
     } catch (error) {

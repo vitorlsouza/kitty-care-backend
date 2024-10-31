@@ -77,6 +77,14 @@ const createSubscriptionSchema = Joi.object({
         'date.required': 'Start date is required',
         'date.format': 'Start date must be a valid ISO 8601 date',
         'date.greater': 'Start date must be in the future'
+    }),
+    provider: Joi.string().valid('PayPal', 'Stripe').required().messages({
+        'any.required': 'Provider is required',
+        'any.only': 'Provider must be either PayPal or Stripe'
+    }),
+    billing_period: Joi.string().valid('Monthly', 'Yearly').required().messages({
+        'any.required': 'Billing period is required',
+        'any.only': 'Billing period must be either Monthly or Yearly'
     })
 });
 
@@ -93,9 +101,11 @@ const updateSubscriptionSchema = Joi.object(
     {
         plan: Joi.string().valid(...Object.values(PLANS)),
         end_date: Joi.date().iso().greater('now'),
-        start_date: Joi.date().iso()
+        start_date: Joi.date().iso(),
+        provider: Joi.string().valid('PayPal', 'Stripe'),
+        billing_period: Joi.string().valid('Monthly', 'Yearly')
     }
-).or('plan', 'end_date', 'start_date').messages({
+).or('plan', 'end_date', 'start_date', 'provider', 'billing_period').messages({
     'object.missing': 'At least one of plan or end_date must be provided'
 });
 
