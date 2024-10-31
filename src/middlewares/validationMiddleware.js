@@ -218,7 +218,8 @@ const validateUpdateCat = (req, res, next) => {
 const chatMessageSchema = Joi.object({
     conversation_id: Joi.number().required(),
     content: Joi.string().required(),
-    role: Joi.string().valid('user', 'assistant').required()
+    role: Joi.string().valid('user', 'assistant').required(),
+    timestamp: Joi.date().iso()
 });
 
 const validateChatMessage = (req, res, next) => {
@@ -234,7 +235,8 @@ const openaiChatSchema = Joi.object({
     catId: Joi.number().integer().required(),
     messages: Joi.array().items(Joi.object({
         role: Joi.string().valid('user', 'assistant').required(),
-        content: Joi.string().required()
+        content: Joi.string().required(),
+        timestamp: Joi.date().iso()
     })).min(1).required()
 });
 
@@ -254,7 +256,8 @@ const updateConversationSchema = Joi.object({
     started_at: Joi.date().iso(),
     messages: Joi.array().items(Joi.object({
         role: Joi.string().valid('user', 'assistant').required(),
-        content: Joi.string().required()
+        content: Joi.string().required(),
+        timestamp: Joi.date().iso()
     })).min(1).required()
 });
 
