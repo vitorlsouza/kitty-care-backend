@@ -970,7 +970,7 @@ describe('POST /api/supabase/conversations', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(201);
-        expect(res.body).toEqual({ conversation_id: mockConversation.id });
+        expect(res.body).toEqual({ id: mockConversation.id });
     });
 
     it('should return 401 for unauthenticated request', async () => {

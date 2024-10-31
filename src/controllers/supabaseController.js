@@ -302,7 +302,7 @@ const createConversation = async (req, res) => {
             return res.status(400).json({ error: result.error });
         }
 
-        res.status(201).json({ conversation_id: result.id });
+        res.status(201).json({ id: result.id });
     } catch (error) {
         console.error("Create conversation error:", error);
         res.status(500).json({ error: "An error occurred while creating the conversation" });
