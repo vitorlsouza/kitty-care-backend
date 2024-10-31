@@ -32,7 +32,7 @@ module.exports.findUserByEmail = async (email) => {
 module.exports.getSubscriptionByUserId = async (userId) => {
     const { data, error } = await supabase
         .from('subscriptions')
-        .select('id, plan, end_date')
+        .select('id, plan, end_date, start_date, provider, billing_period')
         .eq('user_id', userId)
         .single();
 
