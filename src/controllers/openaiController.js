@@ -7,8 +7,14 @@ exports.chat = async (req, res) => {
         const { catId, messages } = req.body;
         const userId = req.user.userId;
 
+        // change each message to ONLY have a role and content
+        const messagesWithRoleAndContent = messages.map(message => ({
+            role: message.role,
+            content: message.content
+        }));
+
         const catDetails = await supabaseService.getCatDetails(userId, catId);
-        const response = await openaiService.sendMessagesToOpenAI(catDetails, messages);
+        const response = await openaiService.sendMessagesToOpenAI(catDetails, messagesWithRoleAndContent);
 
         res.status(200).json({ message: response });
     } catch (error) {
