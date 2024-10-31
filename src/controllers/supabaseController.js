@@ -2,14 +2,15 @@ const supabaseService = require("../services/supabaseService");
 const openaiService = require("../services/openaiService");
 
 const signup = async (req, res) => {
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, password, phone_number } = req.body;
 
     try {
         const { token, expiresIn } = await supabaseService.signupUser(
             first_name,
             last_name,
             email,
-            password
+            password,
+            phone_number,
         );
         res.status(201).json({ token, expiresIn });
     } catch (error) {
@@ -71,23 +72,18 @@ const getSubscription = async (req, res) => {
 const createSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { plan, end_date } = req.body;
+        const { plan, end_date, start_date, provider, billing_period } = req.body;
 
-        const subscription = await supabaseService.createSubscription(
-            userId,
-            plan,
-            end_date
-        );
-        res.status(201).json(subscription);
-    } catch (error) {
-        if (error.message === "User already has a subscription") {
-            res.status(400).json({ error: error.message });
-        } else {
-            console.error("Create subscription error:", error);
-            res
-                .status(500)
-                .json({ error: "An error occurred while creating the subscription" });
+        const result = await supabaseService.createSubscription(userId, plan, end_date, start_date, provider, billing_period);
+
+        if (!result.success) {
+            return res.status(400).json({ error: result.error });
         }
+
+        res.status(201).json(result.data);
+    } catch (error) {
+        console.error("Create subscription error:", error);
+        res.status(500).json({ error: "An error occurred while creating the subscription" });
     }
 };
 
@@ -95,13 +91,16 @@ const updateSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
         const subscriptionId = req.params.id;
-        const { plan, end_date } = req.body;
+        const { plan, end_date, start_date, provider, billing_period } = req.body;
 
         const subscription = await supabaseService.updateSubscription(
             subscriptionId,
             userId,
             plan,
-            end_date
+            end_date,
+            start_date,
+            provider,
+            billing_period
         );
         res.json(subscription);
     } catch (error) {
@@ -161,7 +160,7 @@ const getCats = async (req, res) => {
 const createCat = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const catData = req.body;
+        const { photo, ...catData } = req.body;
 
         const cat = await supabaseService.createCat(userId, catData);
 
@@ -171,7 +170,16 @@ const createCat = async (req, res) => {
             aiRecommendations
         );
 
-        res.status(201).json(updatedCat);
+        if (photo) {
+            const { data, error } = await supabaseService.uploadPhoto(photo, cat.id);
+            if (error) {
+                return res.status(500).json({ error: "An error occurred while uploading the photo" });
+            }
+            updatedCat.photo = data.url;
+        }
+        const finalCat = await supabaseService.updateCat(cat.id, userId, updatedCat);
+
+        res.status(201).json(finalCat);
     } catch (error) {
         console.error("Create cat error:", error);
         res.status(500).json({ error: "An error occurred while creating the cat" });
@@ -182,10 +190,19 @@ const updateCat = async (req, res) => {
     try {
         const userId = req.user.userId;
         const catId = req.params.id;
-        const catData = req.body;
+        const { photo, ...catData } = req.body;
 
         const updatedCat = await supabaseService.updateCat(catId, userId, catData);
-        res.json(updatedCat);
+        if (photo) {
+            const { data, error } = await supabaseService.uploadPhoto(photo, catId);
+            if (error) {
+                return res.status(500).json({ error: "An error occurred while uploading the photo" });
+            }
+            updatedCat.photo = data.url;
+        }
+        const finalUpdatedCat = await supabaseService.updateCat(catId, userId, updatedCat);
+
+        res.json(finalUpdatedCat);
     } catch (error) {
         console.error("Update cat error:", error);
         if (error.message === "Cat not found") {

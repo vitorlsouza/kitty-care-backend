@@ -31,7 +31,8 @@ const signupSchema = Joi.object({
     }),
     password: Joi.string().pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'))
         .message('Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (@$!%*?&)')
-        .required()
+        .required(),
+    phone_number: Joi.string().optional(),
 });
 
 const validateSignup = (req, res, next) => {
@@ -71,6 +72,19 @@ const createSubscriptionSchema = Joi.object({
         'date.required': 'End date is required',
         'date.format': 'End date must be a valid ISO 8601 date',
         'date.greater': 'End date must be in the future'
+    }),
+    start_date: Joi.date().iso().required().greater('now').messages({
+        'date.required': 'Start date is required',
+        'date.format': 'Start date must be a valid ISO 8601 date',
+        'date.greater': 'Start date must be in the future'
+    }),
+    provider: Joi.string().valid('PayPal', 'Stripe').required().messages({
+        'any.required': 'Provider is required',
+        'any.only': 'Provider must be either PayPal or Stripe'
+    }),
+    billing_period: Joi.string().valid('Monthly', 'Yearly').required().messages({
+        'any.required': 'Billing period is required',
+        'any.only': 'Billing period must be either Monthly or Yearly'
     })
 });
 
@@ -86,9 +100,12 @@ const validateCreateSubscription = (req, res, next) => {
 const updateSubscriptionSchema = Joi.object(
     {
         plan: Joi.string().valid(...Object.values(PLANS)),
-        end_date: Joi.date().iso().greater('now')
+        end_date: Joi.date().iso().greater('now'),
+        start_date: Joi.date().iso(),
+        provider: Joi.string().valid('PayPal', 'Stripe'),
+        billing_period: Joi.string().valid('Monthly', 'Yearly')
     }
-).or('plan', 'end_date').messages({
+).or('plan', 'end_date', 'start_date', 'provider', 'billing_period').messages({
     'object.missing': 'At least one of plan or end_date must be provided'
 });
 
@@ -108,6 +125,7 @@ const createCatSchema = Joi.object({
     goal: Joi.string().required().messages({
         'any.required': 'Goal is required'
     }),
+    photo: Joi.string(),
     issues_faced: Joi.string().allow(''),
     activity_level: Joi.string().required().messages({
         'any.required': 'Activity level is required'
@@ -167,6 +185,7 @@ const validateCreateCat = (req, res, next) => {
 const updateCatSchema = Joi.object({
     name: Joi.string(),
     goal: Joi.string(),
+    photo: Joi.string(),
     issues_faced: Joi.string().allow(''),
     activity_level: Joi.string(),
     gender: Joi.string().valid('Male', 'Female'),

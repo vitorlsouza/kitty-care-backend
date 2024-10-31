@@ -5,12 +5,13 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 module.exports = supabase;
 
-module.exports.createUserInDatabase = async (first_name, last_name, email, hashedPassword) => {
+module.exports.createUserInDatabase = async (first_name, last_name, email, hashedPassword, phone_number = null) => {
     const { data, error } = await supabase.from('users').insert({
         first_name: first_name,
         last_name: last_name,
         email: email,
-        password: hashedPassword
+        password: hashedPassword,
+        phone_number: phone_number
     }).select().single();
 
     if (error) throw error;
@@ -31,7 +32,7 @@ module.exports.findUserByEmail = async (email) => {
 module.exports.getSubscriptionByUserId = async (userId) => {
     const { data, error } = await supabase
         .from('subscriptions')
-        .select('id, plan, end_date')
+        .select('id, plan, end_date, start_date, provider, billing_period')
         .eq('user_id', userId)
         .single();
 
@@ -50,13 +51,16 @@ module.exports.checkExistingSubscription = async (userId) => {
     return data !== null;
 };
 
-module.exports.createSubscriptionForUserId = async (userId, plan, endDate) => {
+module.exports.createSubscriptionForUserId = async (userId, plan, endDate, startDate, provider, billingPeriod) => {
     const { data, error } = await supabase
         .from('subscriptions')
         .insert({
             user_id: userId,
             plan: plan,
-            end_date: endDate
+            end_date: endDate,
+            start_date: startDate,
+            provider: provider,
+            billing_period: billingPeriod
         })
         .select()
         .single();
@@ -65,10 +69,10 @@ module.exports.createSubscriptionForUserId = async (userId, plan, endDate) => {
     return data;
 };
 
-module.exports.updateSubscriptionForUserId = async (subscriptionId, userId, plan, endDate) => {
+module.exports.updateSubscriptionForUserId = async (subscriptionId, userId, plan, endDate, startDate, provider, billingPeriod) => {
     const { data, error } = await supabase
         .from('subscriptions')
-        .update({ plan, end_date: endDate })
+        .update({ plan, end_date: endDate, start_date: startDate, provider, billing_period: billingPeriod })
         .eq('id', subscriptionId)
         .eq('user_id', userId)
         .select()
@@ -333,4 +337,38 @@ module.exports.updateConversationById = async (conversationId, userId, started_a
 
     if (error) throw error;
     return data;
+};
+
+module.exports.uploadPhotoToSupabase = async (photo, catId) => {
+    if (!photo) {
+        throw new Error('Invalid photo data');
+    }
+
+    try {
+        const fileExt = photo.originalname.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `cat-photos/${catId}/${fileName}`;
+
+        const { data, error } = await supabase.storage
+            .from('Cats')
+            .upload(filePath, photo.buffer, {
+                contentType: photo.mimetype,
+                upsert: false
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('Cats')
+            .getPublicUrl(filePath);
+
+        return {
+            path: filePath,
+            url: publicUrl
+        };
+    } catch (error) {
+        throw new Error(`Failed to upload photo: ${error.message}`);
+    }
 };

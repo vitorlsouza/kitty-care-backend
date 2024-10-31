@@ -21,12 +21,13 @@ const {
     deleteConversationById,
     getCatDetailsById,
     getConversationsByConversationId,
-    updateConversationById
+    updateConversationById,
+    uploadPhotoToSupabase
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
 
-const signupUser = async (first_name, last_name, email, password) => {
+const signupUser = async (first_name, last_name, email, password, phone_number) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
@@ -34,7 +35,8 @@ const signupUser = async (first_name, last_name, email, password) => {
             first_name,
             last_name,
             email,
-            hashedPassword
+            hashedPassword,
+            phone_number
         );
         if (!user) {
             throw new Error("Failed to create user");
@@ -81,18 +83,22 @@ const getSubscription = async (userId) => {
     return subscription;
 };
 
-const createSubscription = async (userId, plan, endDate) => {
-    const hasExistingSubscription = await checkExistingSubscription(userId);
-    if (hasExistingSubscription) {
-        throw new Error("User already has a subscription");
-    }
+const createSubscription = async (userId, plan, endDate, startDate, provider, billingPeriod) => {
+    try {
+        const hasSubscription = await checkExistingSubscription(userId);
+        if (hasSubscription) {
+            return { success: false, error: 'User already has a subscription' };
+        }
 
-    const subscription = await createSubscriptionForUserId(userId, plan, endDate);
-    return subscription;
+        const subscription = await createSubscriptionForUserId(userId, plan, endDate, startDate, provider, billingPeriod);
+        return { success: true, data: subscription };
+    } catch (error) {
+        throw error;
+    }
 };
 
-const updateSubscription = async (subscriptionId, userId, plan, endDate) => {
-    const subscription = await updateSubscriptionForUserId(subscriptionId, userId, plan, endDate);
+const updateSubscription = async (subscriptionId, userId, plan, endDate, startDate, provider, billingPeriod) => {
+    const subscription = await updateSubscriptionForUserId(subscriptionId, userId, plan, endDate, startDate, provider, billingPeriod);
     if (!subscription) {
         throw new Error("Subscription not found");
     }
@@ -150,6 +156,18 @@ const createCat = async (userId, catData) => {
     try {
         const cat = await createCatByUserId(userId, catData);
         return cat;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const uploadPhoto = async (photo) => {
+    try {
+        if (!photo) {
+            throw new Error('Invalid photo data');
+        }
+        const result = await uploadPhotoToSupabase(photo);
+        return result;
     } catch (error) {
         throw error;
     }
@@ -328,5 +346,6 @@ module.exports = {
     createNewConversation,
     updateConversation,
     createConversation,
-    getConversationByConversationId
+    getConversationByConversationId,
+    uploadPhoto
 };

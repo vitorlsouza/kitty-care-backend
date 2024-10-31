@@ -166,7 +166,10 @@ describe('GET /api/supabase/subscriptions', () => {
         supabase.getSubscriptionByUserId.mockResolvedValue({
             id: 1,
             plan: 'Basic',
-            end_date: '2029-12-31'
+            end_date: '2029-12-31',
+            start_date: '2024-01-01',
+            provider: 'PayPal',
+            billing_period: 'Monthly'
         });
 
         const res = await request(app)
@@ -205,13 +208,16 @@ describe('POST /api/supabase/subscriptions', () => {
     });
 
     it('should create a subscription for authenticated user', async () => {
-        const token = jwt.sign({ userId: 36 }, JWT_SECRET);
+        const token = jwt.sign({ userId: 37 }, JWT_SECRET);
         supabase.checkExistingSubscription.mockResolvedValue(false);
         supabase.createSubscriptionForUserId.mockResolvedValue({
             id: 1,
             user_id: 1,
             plan: 'Basic',
-            end_date: '2029-12-31'
+            end_date: '2029-12-31',
+            start_date: '2024-01-01',
+            provider: 'PayPal',
+            billing_period: 'Monthly'
         });
 
         const res = await request(app)
@@ -219,7 +225,10 @@ describe('POST /api/supabase/subscriptions', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 plan: 'Basic',
-                end_date: '2029-12-31'
+                end_date: '2029-12-31',
+                start_date: '2025-01-01',
+                provider: 'PayPal',
+                billing_period: 'Monthly'
             });
 
         expect(res.statusCode).toBe(201);
@@ -227,10 +236,13 @@ describe('POST /api/supabase/subscriptions', () => {
         expect(res.body).toHaveProperty('user_id');
         expect(res.body).toHaveProperty('plan');
         expect(res.body).toHaveProperty('end_date');
+        expect(res.body).toHaveProperty('start_date');
+        expect(res.body).toHaveProperty('provider');
+        expect(res.body).toHaveProperty('billing_period');
     });
 
     it('should return 400 if user already has a subscription', async () => {
-        const token = jwt.sign({ userId: 1 }, JWT_SECRET);
+        const token = jwt.sign({ userId: 37 }, JWT_SECRET);
         supabase.checkExistingSubscription.mockResolvedValue(true);
 
         const res = await request(app)
@@ -238,7 +250,10 @@ describe('POST /api/supabase/subscriptions', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 plan: 'Basic',
-                end_date: '2029-12-31'
+                end_date: '2029-12-31',
+                start_date: '2025-01-01',
+                provider: 'PayPal',
+                billing_period: 'Monthly'
             });
 
         expect(res.statusCode).toBe(400);
@@ -286,7 +301,10 @@ describe('PUT /api/supabase/subscriptions/:id', () => {
             id: subscriptionId,
             user_id: userId,
             plan: 'Premium',
-            end_date: '2024-12-31'
+            end_date: '2024-12-31',
+            start_date: '2024-01-01',
+            provider: 'PayPal',
+            billing_period: 'Monthly'
         });
 
         const res = await request(app)
@@ -294,7 +312,10 @@ describe('PUT /api/supabase/subscriptions/:id', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 plan: 'Premium',
-                end_date: '2024-12-31'
+                end_date: '2024-12-31',
+                start_date: '2024-01-01',
+                provider: 'PayPal',
+                billing_period: 'Monthly'
             });
 
         expect(res.statusCode).toBe(200);
@@ -302,6 +323,9 @@ describe('PUT /api/supabase/subscriptions/:id', () => {
         expect(res.body).toHaveProperty('user_id', userId);
         expect(res.body.plan).toBe('Premium');
         expect(res.body.end_date).toBe('2024-12-31');
+        expect(res.body.start_date).toBe('2024-01-01');
+        expect(res.body.provider).toBe('PayPal');
+        expect(res.body.billing_period).toBe('Monthly');
     });
 
     it('should return 404 if no subscription found', async () => {
@@ -316,7 +340,10 @@ describe('PUT /api/supabase/subscriptions/:id', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 plan: 'Premium',
-                end_date: '2024-12-31'
+                end_date: '2024-12-31',
+                start_date: '2024-01-01',
+                provider: 'PayPal',
+                billing_period: 'Monthly'
             });
 
         expect(res.statusCode).toBe(404);
@@ -331,7 +358,10 @@ describe('PUT /api/supabase/subscriptions/:id', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 plan: 'InvalidPlan',
-                end_date: 'invalid-date'
+                end_date: 'invalid-date',
+                start_date: 'invalid-date',
+                provider: 'InvalidProvider',
+                billing_period: 'InvalidBillingPeriod'
             });
 
         expect(res.statusCode).toBe(400);
@@ -344,7 +374,10 @@ describe('PUT /api/supabase/subscriptions/:id', () => {
             .put(`/api/supabase/subscriptions/${subscriptionId}`)
             .send({
                 plan: 'Premium',
-                end_date: '2024-12-31'
+                end_date: '2024-12-31',
+                start_date: '2024-01-01',
+                provider: 'PayPal',
+                billing_period: 'Monthly'
             });
 
         expect(res.statusCode).toBe(401);
