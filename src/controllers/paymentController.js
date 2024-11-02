@@ -16,7 +16,7 @@ const createStripeSubscription = async (req, res) => {
             return res.status(400).json({ error: result.error });
         }
 
-        res.status(201).json({ invoice: result.invoice });
+        res.status(201).json({ success: true });
     } catch (error) {
         console.error("Subscription creation error:", error);
         res.status(500).json({ error: error.message });
