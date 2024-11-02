@@ -127,7 +127,9 @@ const createCatSchema = Joi.object({
         'any.required': 'Goals are required'
     }),
     photo: Joi.string(),
-    issues_faced: Joi.string().allow(''),
+    issues_faced: Joi.string().required().messages({
+        'any.required': 'Issues faced are required'
+    }),
     activity_level: Joi.string().required().messages({
         'any.required': 'Activity level is required'
     }),
@@ -167,11 +169,13 @@ const createCatSchema = Joi.object({
     training_days: Joi.string().required().messages({
         'any.required': 'Training days is required'
     }),
-    medical_conditions: Joi.string().allow(''),
-    medications: Joi.string().allow(''),
-    dietary_restrictions: Joi.string().allow(''),
-    surgery_history: Joi.string().allow(''),
-    items: Joi.string().allow('')
+    medical_conditions: Joi.string().allow('').allow(null),
+    medications: Joi.string().allow('').allow(null),
+    dietary_restrictions: Joi.string().allow('').allow(null),
+    surgery_history: Joi.string().allow('').allow(null),
+    items: Joi.string().required().messages({
+        'any.required': 'Items are required'
+    })
 });
 
 const validateCreateCat = (req, res, next) => {
@@ -199,11 +203,13 @@ const updateCatSchema = Joi.object({
     required_progress: Joi.string(),
     check_in_period: Joi.string().valid('Daily', 'Weekly', 'Bi-weekly', 'Monthly'),
     training_days: Joi.string(),
-    medical_conditions: Joi.string().allow(''),
-    medications: Joi.string().allow(''),
-    dietary_restrictions: Joi.string().allow(''),
-    surgery_history: Joi.string().allow(''),
-    items: Joi.string().allow('')
+    medical_conditions: Joi.string().allow('').allow(null),
+    medications: Joi.string().allow('').allow(null),
+    dietary_restrictions: Joi.string().allow('').allow(null),
+    surgery_history: Joi.string().allow('').allow(null),
+    items: Joi.string().required().messages({
+        'any.required': 'Items are required'
+    })
 }).min(1);
 
 const validateUpdateCat = (req, res, next) => {
