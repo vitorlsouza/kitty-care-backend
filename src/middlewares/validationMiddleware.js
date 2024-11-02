@@ -190,7 +190,7 @@ const validateCreateCat = (req, res, next) => {
 const updateCatSchema = Joi.object({
     name: Joi.string(),
     goal: Joi.string(),
-    photo: Joi.string(),
+    photo: Joi.any(),
     issues_faced: Joi.string().allow(''),
     activity_level: Joi.string(),
     gender: Joi.string().valid('Male', 'Female'),
