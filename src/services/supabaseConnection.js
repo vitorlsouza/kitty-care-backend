@@ -349,6 +349,10 @@ module.exports.uploadPhotoToSupabase = async (photoData, catId) => {
         const fileName = `${Date.now()}.${fileExt}`;
         const filePath = `cat-photos/${catId}/${fileName}`;
 
+        console.log("filePath", filePath);
+        console.log("photoData.buffer", photoData.buffer);
+        console.log("photoData.mimetype", photoData.mimetype);
+
         const { data, error } = await supabase.storage
             .from('Cats')
             .upload(filePath, photoData.buffer, {
