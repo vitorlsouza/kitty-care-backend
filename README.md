@@ -496,7 +496,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "medical_conditions": "",
       "medications": "",
       "dietary_restrictions": "",
-      "surgery_history": "",
+      "medical_history": "",
       "items": ""
     }
     ```
@@ -520,7 +520,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
   - `medical_conditions`: Optional, string.
   - `medications`: Optional, string.
   - `dietary_restrictions`: Optional, string.
-  - `surgery_history`: Optional, string.
+  - `medical_history`: Optional, string.
   - `items`: Optional, string.
 
 - **Responses**:
@@ -546,7 +546,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "medical_conditions": "",
       "medications": "",
       "dietary_restrictions": "",
-      "surgery_history": "",
+      "medical_history": "",
       "items": "",
       "food_bowls": "Automatic",
       "treats": "Organic",
@@ -609,7 +609,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
 
 - **Validation Rules**:
   - At least one of the following fields must be provided:
-    - `name`, `goal`, `issues_faced`, `activity_level`, `gender`, `age`, `country`, `zipcode`, `breed`, `weight`, `target_weight`, `required_progress`, `check_in_period`, `training_days`, `medical_conditions`, `medications`, `dietary_restrictions`, `surgery_history`, `items`.
+    - `name`, `goal`, `issues_faced`, `activity_level`, `gender`, `age`, `country`, `zipcode`, `breed`, `weight`, `target_weight`, `required_progress`, `check_in_period`, `training_days`, `medical_conditions`, `medications`, `dietary_restrictions`, `medical_history`, `items`.
   - If provided:
     - `gender`: Must be either `Male` or `Female`.
     - `age`: Must be an integer.
@@ -639,7 +639,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
       "medical_conditions": "",
       "medications": "",
       "dietary_restrictions": "",
-      "surgery_history": "",
+      "medical_history": "",
       "items": "",
       "food_bowls": "Automatic",
       "treats": "Organic",
@@ -1138,7 +1138,7 @@ All endpoints are prefixed with either `/api/openai` or `/api/supabase`.
   - `medical_conditions` (string): Any medical conditions.
   - `medications` (string): Medications.
   - `dietary_restrictions` (string): Dietary restrictions.
-  - `surgery_history` (string): Surgery history.
+  - `medical_history` (string): Surgery history.
   - `items` (string): Items.
   - **AI Recommendations**:
     - `food_bowls` (string)

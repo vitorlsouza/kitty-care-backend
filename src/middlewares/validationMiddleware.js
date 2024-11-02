@@ -172,7 +172,7 @@ const createCatSchema = Joi.object({
     medical_conditions: Joi.string().allow('').allow(null),
     medications: Joi.string().allow('').allow(null),
     dietary_restrictions: Joi.string().allow('').allow(null),
-    surgery_history: Joi.string().allow('').allow(null),
+    medical_history: Joi.string().allow('').allow(null),
     items: Joi.string().required().messages({
         'any.required': 'Items are required'
     })
@@ -206,7 +206,7 @@ const updateCatSchema = Joi.object({
     medical_conditions: Joi.string().allow('').allow(null),
     medications: Joi.string().allow('').allow(null),
     dietary_restrictions: Joi.string().allow('').allow(null),
-    surgery_history: Joi.string().allow('').allow(null),
+    medical_history: Joi.string().allow('').allow(null),
     items: Joi.string()
 }).min(1);
 
