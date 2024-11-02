@@ -394,5 +394,5 @@ module.exports = {
     createConversation,
     updateConversation,
     getAllConversations,
-    getConversationByConversationId,
+    getConversationByConversationId
 };

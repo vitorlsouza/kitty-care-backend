@@ -27,7 +27,8 @@
     "express": "^4.21.1",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
-    "openai": "^4.68.3"
+    "openai": "^4.68.3",
+    "stripe": "^17.3.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",

@@ -119,6 +119,32 @@ const validateUpdateSubscription = (req, res, next) => {
     next();
 };
 
+const createStripeSubscriptionSchema = Joi.object({
+    name: Joi.string().required().messages({
+        'any.required': 'Name is required'
+    }),
+    email: Joi.string().email().required().messages({
+        'string.email': 'Invalid email format',
+        'any.required': 'Email is required'
+    }),
+    paymentMethodId: Joi.string().required().messages({
+        'any.required': 'Payment method ID is required'
+    }),
+    priceId: Joi.string().required().messages({
+        'any.required': 'Price ID is required'
+    }),
+    trial_end: Joi.number().optional()
+});
+
+const validateCreateStripeSubscription = (req, res, next) => {
+    const { error } = createStripeSubscriptionSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        const errors = error.details.map(detail => detail.message);
+        return res.status(400).json({ errors });
+    }
+    next();
+};
+
 const createCatSchema = Joi.object({
     name: Joi.string().messages({
         'any.required': 'Name is required'
@@ -274,4 +300,23 @@ const validateUpdateConversation = (req, res, next) => {
     next();
 };
 
-module.exports = { validateInput, validateSignup, validateSignin, validateCreateSubscription, validateUpdateSubscription, validateCreateCat, validateUpdateCat, validateChatMessage, validateOpenAIChat, validateUpdateConversation };
+const testPaymentSchema = Joi.object({
+    amount: Joi.number().required().min(50).max(999999),  // amount in cents
+    currency: Joi.string().required().valid('usd', 'eur', 'gbp'),
+    payment_method: Joi.string().required()
+}).messages({
+    'number.min': 'Amount must be at least 50 cents',
+    'number.max': 'Amount cannot exceed 9999.99',
+    'string.valid': 'Currency must be one of: usd, eur, gbp'
+});
+
+const validateTestPayment = (req, res, next) => {
+    const { error } = testPaymentSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        const errors = error.details.map(detail => detail.message);
+        return res.status(400).json({ errors });
+    }
+    next();
+};
+
+module.exports = { validateInput, validateSignup, validateSignin, validateCreateSubscription, validateUpdateSubscription, validateCreateCat, validateUpdateCat, validateChatMessage, validateOpenAIChat, validateUpdateConversation, validateTestPayment, validateCreateStripeSubscription };

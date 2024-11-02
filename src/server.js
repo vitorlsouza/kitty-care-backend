@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const openaiRoutes = require('./routes/openaiRoutes');
 const supabaseRoutes = require('./routes/supabaseRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.json());
 
 app.use('/api/openai', openaiRoutes);
 app.use('/api/supabase', supabaseRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.get('/', (req, res) => {
     res.send('Server is up and running! 😸');
