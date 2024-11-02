@@ -201,15 +201,13 @@ const updateCatSchema = Joi.object({
     weight: Joi.number().positive(),
     target_weight: Joi.number().positive(),
     required_progress: Joi.string(),
-    check_in_period: Joi.string().valid('Daily', 'Weekly', 'Bi-weekly', 'Monthly'),
+    check_in_period: Joi.string().valid('Daily', '3 Times a Week', 'Weekly'),
     training_days: Joi.string(),
     medical_conditions: Joi.string().allow('').allow(null),
     medications: Joi.string().allow('').allow(null),
     dietary_restrictions: Joi.string().allow('').allow(null),
     surgery_history: Joi.string().allow('').allow(null),
-    items: Joi.string().required().messages({
-        'any.required': 'Items are required'
-    })
+    items: Joi.string()
 }).min(1);
 
 const validateUpdateCat = (req, res, next) => {
