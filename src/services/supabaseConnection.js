@@ -353,9 +353,11 @@ module.exports.uploadPhotoToSupabase = async (photoData, catId) => {
         console.log("photoData.buffer", photoData.buffer);
         console.log("photoData.mimetype", photoData.mimetype);
 
+        const buffer = Buffer.from(photoData.buffer);
+
         const { data, error } = await supabase.storage
             .from('Cats')
-            .upload(filePath, photoData.buffer, {
+            .upload(filePath, buffer, {
                 contentType: photoData.mimetype,
                 upsert: false
             });
