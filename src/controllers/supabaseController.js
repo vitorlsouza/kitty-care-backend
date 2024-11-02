@@ -194,7 +194,7 @@ const updateCat = async (req, res) => {
 
         const updatedCat = await supabaseService.updateCat(catId, userId, catData);
         if (photo) {
-            const { data, error } = await supabaseService.uploadPhoto(photo, catId);
+            const { data, error } = await supabaseService.uploadPhoto(catId, photo);
             if (error) {
                 return res.status(500).json({ message: "An error occurred while uploading the photo" });
             }

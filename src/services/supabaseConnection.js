@@ -339,7 +339,7 @@ module.exports.updateConversationById = async (conversationId, userId, started_a
     return data;
 };
 
-module.exports.uploadPhotoToSupabase = async (photoData, catId) => {
+module.exports.uploadPhotoToSupabase = async (catId, photoData) => {
     if (!photoData) {
         throw new Error('Invalid photo data');
     }
@@ -348,10 +348,6 @@ module.exports.uploadPhotoToSupabase = async (photoData, catId) => {
         const fileExt = photoData.originalname.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         const filePath = `cat-photos/${catId}/${fileName}`;
-
-        console.log("filePath", filePath);
-        console.log("photoData.buffer", photoData.buffer);
-        console.log("photoData.mimetype", photoData.mimetype);
 
         const buffer = Buffer.from(photoData.buffer);
 
