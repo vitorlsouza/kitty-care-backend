@@ -366,6 +366,8 @@ module.exports.uploadPhotoToSupabase = async (catId, photoData) => {
             .from('Cats')
             .getPublicUrl(filePath);
 
+        console.log("Public URL:", publicUrl);
+
         return {
             path: filePath,
             url: publicUrl
