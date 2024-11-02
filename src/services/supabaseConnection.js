@@ -350,6 +350,7 @@ module.exports.uploadPhotoToSupabase = async (catId, photoData) => {
         const filePath = `cat-photos/${catId}/${fileName}`;
 
         const buffer = Buffer.from(photoData.buffer);
+        console.log("Buffer:", buffer);
 
         const { data, error } = await supabase.storage
             .from('Cats')
@@ -361,6 +362,7 @@ module.exports.uploadPhotoToSupabase = async (catId, photoData) => {
         if (error) {
             throw error;
         }
+        console.log("Uploaded photo to Supabase:", data);
 
         const { data: { publicUrl } } = supabase.storage
             .from('Cats')
