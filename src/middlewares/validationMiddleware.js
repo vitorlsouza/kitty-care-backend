@@ -120,11 +120,11 @@ const validateUpdateSubscription = (req, res, next) => {
 };
 
 const createCatSchema = Joi.object({
-    name: Joi.string().required().messages({
+    name: Joi.string().messages({
         'any.required': 'Name is required'
     }),
-    goal: Joi.string().required().messages({
-        'any.required': 'Goal is required'
+    goals: Joi.string().required().messages({
+        'any.required': 'Goals are required'
     }),
     photo: Joi.string(),
     issues_faced: Joi.string().allow(''),
