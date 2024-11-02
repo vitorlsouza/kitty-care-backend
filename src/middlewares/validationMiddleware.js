@@ -160,8 +160,8 @@ const createCatSchema = Joi.object({
     required_progress: Joi.string().required().messages({
         'any.required': 'Required progress is required'
     }),
-    check_in_period: Joi.string().valid('Daily', 'Weekly', 'Bi-weekly', 'Monthly').required().messages({
-        'any.only': 'Check-in period must be one of: Daily, Weekly, Bi-weekly, Monthly',
+    check_in_period: Joi.string().valid('Daily', '3 Times a Week', 'Weekly').required().messages({
+        'any.only': 'Check-in period must be one of: Daily, 3 Times a Week, Weekly',
         'any.required': 'Check-in period is required'
     }),
     training_days: Joi.string().required().messages({
