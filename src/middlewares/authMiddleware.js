@@ -10,8 +10,9 @@ const authenticateToken = (req, res, next) => {
     }
 
     try {
-        const user = jwt.verify(token, JWT_SECRET);
-        req.user = user;
+        console.log("jwt.verify(token, JWT_SECRET)", jwt.verify(token, JWT_SECRET));
+        const { userId } = jwt.verify(token, JWT_SECRET);
+        req.user = userId;
         next();
     } catch (error) {
         return res.status(401).json({ message: 'Invalid token. User not authenticated.' });

@@ -73,7 +73,6 @@ const createSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
         const { id, plan, end_date, start_date, provider, billing_period } = req.body;
-        console.log('createSubscription', userId, id, plan, end_date, start_date, provider, billing_period);
 
         const result = await supabaseService.createSubscription(userId, id, plan, end_date, start_date, provider, billing_period);
 

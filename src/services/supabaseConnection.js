@@ -52,7 +52,6 @@ module.exports.checkExistingSubscription = async (userId) => {
 };
 
 module.exports.createSubscriptionForUserId = async (userId, id, plan, endDate, startDate, provider, billingPeriod) => {
-    console.log('createSubscriptionForUserId', userId, id, plan, endDate, startDate, provider, billingPeriod);
     const { data, error } = await supabase
         .from('subscriptions')
         .insert({
