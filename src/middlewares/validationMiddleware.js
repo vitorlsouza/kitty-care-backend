@@ -75,10 +75,9 @@ const createSubscriptionSchema = Joi.object({
         'date.format': 'End date must be a valid ISO 8601 date',
         'date.greater': 'End date must be in the future'
     }),
-    start_date: Joi.date().iso().required().min('now').messages({
+    start_date: Joi.date().iso().required().messages({
         'date.required': 'Start date is required',
         'date.format': 'Start date must be a valid ISO 8601 date',
-        'date.min': 'Start date must be in the future or today'
     }),
     provider: Joi.string().valid('PayPal', 'Stripe').required().messages({
         'any.required': 'Provider is required',
