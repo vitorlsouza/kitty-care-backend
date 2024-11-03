@@ -35,6 +35,25 @@ const createSubscription = async ({ name, email, paymentMethodId, priceId, trial
     }
 };
 
+const cancelSubscription = async (subscriptionId) => {
+    try {
+        const subscription = await stripe.subscriptions.cancel(subscriptionId);
+
+        return {
+            success: true,
+            id: subscription.id,
+            status: subscription.status
+        };
+    } catch (error) {
+        console.error('Stripe subscription cancellation error:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+};
+
 module.exports = {
-    createSubscription
+    createSubscription,
+    cancelSubscription
 }; 

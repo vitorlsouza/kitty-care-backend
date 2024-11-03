@@ -80,4 +80,74 @@ describe('POST /api/payments/stripe/subscription', () => {
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty('error', 'Stripe API error');
     });
+});
+
+describe('DELETE /api/payments/stripe/subscription/:subscriptionId', () => {
+    const mockUserId = 36;
+    const mockSubscriptionId = 'sub_test_123';
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should cancel a subscription successfully', async () => {
+        const token = jwt.sign({ userId: mockUserId }, JWT_SECRET);
+        const mockCancellationResult = {
+            success: true,
+            id: mockSubscriptionId,
+            status: 'canceled'
+        };
+
+        stripeService.cancelSubscription.mockResolvedValue(mockCancellationResult);
+
+        const res = await request(app)
+            .delete(`/api/payments/stripe/subscription/${mockSubscriptionId}`)
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({
+            success: true,
+            subscriptionId: mockSubscriptionId,
+            status: 'canceled'
+        });
+        expect(stripeService.cancelSubscription).toHaveBeenCalledWith(mockSubscriptionId);
+    });
+
+    it('should return 401 for unauthenticated request', async () => {
+        const res = await request(app)
+            .delete(`/api/payments/stripe/subscription/${mockSubscriptionId}`);
+
+        expect(res.status).toBe(401);
+        expect(res.body.message).toBe('Authentication token is missing');
+    });
+
+    it('should return 400 for invalid subscription ID', async () => {
+        const token = jwt.sign({ userId: mockUserId }, JWT_SECRET);
+        const mockErrorResult = {
+            success: false,
+            error: 'No such subscription: invalid_sub_id'
+        };
+
+        stripeService.cancelSubscription.mockResolvedValue(mockErrorResult);
+
+        const res = await request(app)
+            .delete('/api/payments/stripe/subscription/invalid_sub_id')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error');
+        expect(res.body.error).toBe('No such subscription: invalid_sub_id');
+    });
+
+    it('should return 500 for stripe service errors', async () => {
+        const token = jwt.sign({ userId: mockUserId }, JWT_SECRET);
+        stripeService.cancelSubscription.mockRejectedValue(new Error('Stripe API error'));
+
+        const res = await request(app)
+            .delete(`/api/payments/stripe/subscription/${mockSubscriptionId}`)
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty('error', 'Stripe API error');
+    });
 }); 
