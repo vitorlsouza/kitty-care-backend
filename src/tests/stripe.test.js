@@ -23,7 +23,8 @@ describe('POST /api/payments/stripe/subscription', () => {
     it('should create a subscription successfully', async () => {
         const token = jwt.sign({ userId: mockUserId }, JWT_SECRET);
         const mockSubscriptionResult = {
-            success: true
+            success: true,
+            id: 'sub_test_123'
         };
 
         stripeService.createSubscription.mockResolvedValue(mockSubscriptionResult);
@@ -36,6 +37,8 @@ describe('POST /api/payments/stripe/subscription', () => {
         expect(res.status).toBe(201);
         expect(res.body).toHaveProperty('success');
         expect(res.body.success).toEqual(mockSubscriptionResult.success);
+        expect(res.body).toHaveProperty('subscriptionId');
+        expect(res.body.subscriptionId).toEqual(mockSubscriptionResult.id);
     });
 
     it('should return 400 for invalid subscription data', async () => {

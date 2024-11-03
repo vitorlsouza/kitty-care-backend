@@ -22,8 +22,7 @@ const createSubscription = async ({ name, email, paymentMethodId, priceId, trial
 
         return {
             success: true,
-            subscription,
-            invoice: subscription.latest_invoice
+            id: subscription.id
         };
     } catch (error) {
         console.error('Stripe subscription error:', error);
