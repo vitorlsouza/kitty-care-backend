@@ -469,8 +469,8 @@ describe('GET /api/supabase/cats', () => {
         const userId = 36;
         const token = jwt.sign({ userId }, JWT_SECRET);
         const mockCats = [
-            { id: 1, name: 'Whiskers' },
-            { id: 2, name: 'Fluffy' }
+            { id: 1, name: 'Whiskers', goals: 'Weight loss', issues_faced: 'Overweight', required_progress: '1 kg', food_bowls: 'Ceramic bowls', treats: 'Fish-flavored treats', playtime: '30 minutes daily' },
+            { id: 2, name: 'Fluffy', goals: 'Weight loss', issues_faced: 'Overweight', required_progress: '1 kg', food_bowls: 'Ceramic bowls', treats: 'Fish-flavored treats', playtime: '30 minutes daily' }
         ];
 
         supabase.getCatsByUserId.mockResolvedValue(mockCats);

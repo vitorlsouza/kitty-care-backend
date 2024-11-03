@@ -129,7 +129,7 @@ module.exports.getCatDetailsById = async (userId, catId) => {
 module.exports.getCatsByUserId = async (userId) => {
     const { data, error } = await supabase
         .from('cats')
-        .select('id, name, photo, food_bowls, treats, playtime')
+        .select('id, name, photo, goals, issues_faced, required_progress, food_bowls, treats, playtime')
         .eq('user_id', userId);
 
     if (error) throw error;
