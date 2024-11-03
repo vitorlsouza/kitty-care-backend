@@ -20,6 +20,8 @@ const createSubscription = async ({ name, email, paymentMethodId, priceId, trial
             // expand: ['latest_invoice'],
         });
 
+        console.log('subscription', subscription);
+
         return {
             success: true,
             id: subscription.id
