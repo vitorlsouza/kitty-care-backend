@@ -72,9 +72,9 @@ const getSubscription = async (req, res) => {
 const createSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { plan, end_date, start_date, provider, billing_period } = req.body;
+        const { id, plan, end_date, start_date, provider, billing_period } = req.body;
 
-        const result = await supabaseService.createSubscription(userId, plan, end_date, start_date, provider, billing_period);
+        const result = await supabaseService.createSubscription(userId, id, plan, end_date, start_date, provider, billing_period);
 
         if (!result.success) {
             return res.status(400).json({ message: result.error });

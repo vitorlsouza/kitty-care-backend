@@ -51,10 +51,11 @@ module.exports.checkExistingSubscription = async (userId) => {
     return data !== null;
 };
 
-module.exports.createSubscriptionForUserId = async (userId, plan, endDate, startDate, provider, billingPeriod) => {
+module.exports.createSubscriptionForUserId = async (userId, id, plan, endDate, startDate, provider, billingPeriod) => {
     const { data, error } = await supabase
         .from('subscriptions')
         .insert({
+            id: id,
             user_id: userId,
             plan: plan,
             end_date: endDate,
