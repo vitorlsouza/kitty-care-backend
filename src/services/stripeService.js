@@ -39,6 +39,8 @@ const cancelSubscription = async (subscriptionId) => {
     try {
         const subscription = await stripe.subscriptions.cancel(subscriptionId);
 
+        console.log('subscription', subscription);
+
         return {
             success: true,
             id: subscription.id,

@@ -25,12 +25,13 @@ const createStripeSubscription = async (req, res) => {
 
 const cancelStripeSubscription = async (req, res) => {
     try {
-        const { subscriptionId } = req.params;
-        if (!subscriptionId) {
+        const { id } = req.params;
+        if (!id) {
             return res.status(400).json({ error: "Subscription ID is required" });
         }
 
-        const result = await stripeService.cancelSubscription(subscriptionId);
+        console.log("id", id);
+        const result = await stripeService.cancelSubscription(id);
         if (!result.success) {
             return res.status(400).json({ error: result.error });
         }
