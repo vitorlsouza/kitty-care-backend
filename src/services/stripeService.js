@@ -20,8 +20,6 @@ const createSubscription = async ({ name, email, paymentMethodId, priceId, trial
             // expand: ['latest_invoice'],
         });
 
-        console.log('subscription', subscription);
-
         return {
             success: true,
             id: subscription.id
@@ -38,8 +36,6 @@ const createSubscription = async ({ name, email, paymentMethodId, priceId, trial
 const cancelSubscription = async (subscriptionId) => {
     try {
         const subscription = await stripe.subscriptions.cancel(subscriptionId);
-
-        console.log('subscription', subscription);
 
         return {
             success: true,

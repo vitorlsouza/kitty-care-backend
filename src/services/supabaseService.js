@@ -42,8 +42,6 @@ const signupUser = async (first_name, last_name, email, password, phone_number) 
             throw new Error("Failed to create user");
         }
 
-        console.log("user", user);
-
         const full_name = `${first_name} ${last_name}`;
         const expiresIn = "1d";
         const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
@@ -71,8 +69,6 @@ const signinUser = async (email, password) => {
         // Return a different message for incorrect password
         return { error: "Incorrect password" };
     }
-
-    console.log("user", user);
 
     const full_name = `${user.first_name} ${user.last_name}`;
     const expiresIn = "1d";
