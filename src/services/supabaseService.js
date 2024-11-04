@@ -42,6 +42,8 @@ const signupUser = async (first_name, last_name, email, password, phone_number) 
             throw new Error("Failed to create user");
         }
 
+        console.log("user", user);
+
         const full_name = `${first_name} ${last_name}`;
         const expiresIn = "1d";
         const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
