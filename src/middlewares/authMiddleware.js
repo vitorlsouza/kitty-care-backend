@@ -10,6 +10,8 @@ const authenticateToken = (req, res, next) => {
     }
 
     try {
+        console.log("token", token);
+        console.log("jwt.verify(token, JWT_SECRET)", jwt.verify(token, JWT_SECRET));
         const { userId, email, full_name } = jwt.verify(token, JWT_SECRET);
         req.user = { userId, email, full_name };
         next();
