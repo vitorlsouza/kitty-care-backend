@@ -168,12 +168,8 @@ const createCatSchema = Joi.object({
         'number.integer': 'Age must be an integer',
         'any.required': 'Age is required'
     }),
-    country: Joi.string().required().messages({
-        'any.required': 'Country is required'
-    }),
-    zipcode: Joi.string().required().messages({
-        'any.required': 'Zipcode is required'
-    }),
+    country: Joi.string().optional().allow('').allow(null),
+    zipcode: Joi.string().optional().allow('').allow(null),
     breed: Joi.string().required().messages({
         'any.required': 'Breed is required'
     }),
@@ -221,8 +217,8 @@ const updateCatSchema = Joi.object({
     activity_level: Joi.string(),
     gender: Joi.string().valid('Male', 'Female'),
     age: Joi.number().integer(),
-    country: Joi.string(),
-    zipcode: Joi.string(),
+    country: Joi.string().optional().allow('').allow(null),
+    zipcode: Joi.string().optional().allow('').allow(null),
     breed: Joi.string(),
     weight: Joi.number().positive(),
     target_weight: Joi.number().positive(),
