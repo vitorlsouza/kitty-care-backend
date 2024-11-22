@@ -60,7 +60,7 @@ const getResetPasswordHtmlTemplate = (token) => {
                                         style="display: inline-block; background: #ff8706; color: #fff; text-decoration: none; padding: 10px 30px; font-size: 20px; border-radius: 6px; margin-top: 20px;">RESET
                                         YOUR PASSWORD</a>
                                     <h3 style="color: #333333; margin-top: 20px;">This link is valid for one use only and
-                                        expires in 2 hours.</h3>
+                                        expires in 1 hour.</h3>
                                     <p style="text-align: center; margin: 15px 0; font-size: 14px;">
                                         If you didn't request to reset your password, please disregard this message or
                                         contact our customer service department.
