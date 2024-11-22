@@ -379,11 +379,13 @@ const getConversationByConversationId = async (req, res) => {
 const requestPasswordReset = async (req, res) => {
     try {
         const { email } = req.body;
+        console.log(email);
+        
         const result = await supabaseService.requestPasswordReset(email);
         res.status(200).json(result);
     } catch (error) {
         console.error("Request password reset error:", error);
-        res.status(500).json({ message: "An error occurred while requesting password reset" });
+        res.status(500).json({ success: false, message: "An error occurred while requesting password reset" });
     }
 };
 
@@ -395,9 +397,9 @@ const resetPassword = async (req, res) => {
     } catch (error) {
         console.error("Reset password error:", error);
         if (error.message === "Token is invalid or has expired") {
-            res.status(400).json({ message: error.message });
+            res.status(400).json({ success: false, message: error.message });
         } else {
-            res.status(500).json({ message: "An error occurred while resetting the password" });
+            res.status(500).json({ success: false, message: "An error occurred while resetting the password" });
         }
     }
 };

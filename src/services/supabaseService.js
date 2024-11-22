@@ -32,6 +32,8 @@ const {
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
+const { emailTransfer } = require("../config/email");
+const { getResetPasswordHtmlTemplate } = require('../config/email');
 
 const signupUser = async (first_name, last_name, email, password, phone_number) => {
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -342,32 +344,82 @@ const requestPasswordReset = async (email) => {
   const expiresIn = "1h";
   const full_name = user.first_name + user.last_name;
   const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
-  
+
+  // Calculate expiration timestamp
+  const unit = expiresIn.slice(-1);
+  let value = parseInt(expiresIn.slice(0, -1)); // Change `const` to `let`
+
+  switch (unit) {
+    case 'd':
+      value = value * 24 * 60 * 60 * 1000; // Days to milliseconds
+      break;
+    case 'h':
+      value = value * 60 * 60 * 1000; // Hours to milliseconds
+      break;
+    case 'm':
+      value = value * 60 * 1000; // Minutes to milliseconds
+      break;
+    case 's':
+      value = value * 1000; // Seconds to milliseconds
+      break;
+    default:
+      value = value * 60 * 60 * 1000; // Default to hours if no unit is found
+      break;
+  }
+
+  console.log(unit, value);
+
+  // Check if value is a valid number
+  if (isNaN(value)) {
+    return { error: true, message: "Invalid expiration time format" };
+  }
+
+  const expirationTime = new Date(Date.now() + value); // Calculate expiration time
+
+  // If expirationTime is invalid
+  if (isNaN(expirationTime.getTime())) {
+    return { error: true, message: "Invalid expiration time" };
+  }
 
   // Save token and expiration in the database (pseudo-code)
-  await savePasswordResetToken(user.id, token, expiresIn);
+  await savePasswordResetToken(user.id, token, expirationTime);
 
   // Send email (pseudo-code)
-  // await sendPasswordResetEmail(user.email, token);
-  await resetPasswordForEmail(user.email, token);
+  let mailOptions = {
+    from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+    to: user.email,
+    subject: 'Password Reset',
+    html: getResetPasswordHtmlTemplate(token), // Generate the HTML using the token
+  };
 
-  return { success: true, message: "Password reset email sent" };
+  // Send mail
+  try {
+    let info = await emailTransfer.sendMail(mailOptions);
+    console.log("Email sent", info);
+    return { success: true, message: "Password reset email sent" };
+  } catch (error) {
+    console.error('Error occurred: ', error);
+    return { error: true, message: "Failed to send email" };
+  }
 };
 
 const resetPassword = async (token, newPassword) => {
   // Find token in the database and check expiration (pseudo-code)
   const resetToken = await findPasswordResetToken(token);
+  console.log(resetToken, resetToken.expires);
+
   if (!resetToken || resetToken.expires < Date.now()) {
-    throw new Error("Token is invalid or has expired");
+    // throw new Error("Token is invalid or has expired");
+    return { success: false, message: "Token is invalid or has expired" }
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await updateUserPassword(resetToken.userId, hashedPassword);
+  await updateUserPassword(resetToken.user_id, hashedPassword);
 
   // Optionally, delete the token after use
   await deletePasswordResetToken(token);
 
-  return { message: "Password has been reset" };
+  return { success: true, message: "Password has been reset" };
 };
 
 module.exports = {
