@@ -209,6 +209,20 @@ const validateCreateCat = (req, res, next) => {
     next();
 };
 
+const resetPasswordSchema = Joi.object({
+    currentPassword: Joi.string().required(),
+    newPassword: Joi.string().required()
+});
+
+const validateResetPassword = (req, res, next) => {
+    const { error } = resetPasswordSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        const errors = error.details.map(detail => detail.message);
+        return res.status(400).json({ errors });
+    }
+    next();
+};
+
 const updateCatSchema = Joi.object({
     name: Joi.string(),
     goal: Joi.string(),
@@ -315,4 +329,18 @@ const validateTestPayment = (req, res, next) => {
     next();
 };
 
-module.exports = { validateInput, validateSignup, validateSignin, validateCreateSubscription, validateUpdateSubscription, validateCreateCat, validateUpdateCat, validateChatMessage, validateOpenAIChat, validateUpdateConversation, validateTestPayment, validateCreateStripeSubscription };
+module.exports = { 
+    validateInput, 
+    validateSignup, 
+    validateSignin, 
+    validateCreateSubscription, 
+    validateUpdateSubscription, 
+    validateCreateCat, 
+    validateUpdateCat, 
+    validateChatMessage, 
+    validateOpenAIChat, 
+    validateUpdateConversation, 
+    validateTestPayment, 
+    validateCreateStripeSubscription, 
+    validateResetPassword 
+};

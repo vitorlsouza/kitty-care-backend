@@ -26,4 +26,7 @@ router.post('/conversations', authenticateToken, supabaseController.createConver
 router.put('/conversations/:id', authenticateToken, validateUpdateConversation, supabaseController.updateConversation);
 router.delete('/conversations/:id', authenticateToken, supabaseController.deleteConversation);
 
+router.post('/password-reset/request', supabaseController.requestPasswordReset);
+router.post('/password-reset/reset', supabaseController.resetPassword);
+
 module.exports = router;
