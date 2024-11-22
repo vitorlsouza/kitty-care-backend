@@ -376,6 +376,32 @@ const getConversationByConversationId = async (req, res) => {
     }
 };
 
+const requestPasswordReset = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const result = await supabaseService.requestPasswordReset(email);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Request password reset error:", error);
+        res.status(500).json({ message: "An error occurred while requesting password reset" });
+    }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        const result = await supabaseService.resetPassword(token, newPassword);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Reset password error:", error);
+        if (error.message === "Token is invalid or has expired") {
+            res.status(400).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "An error occurred while resetting the password" });
+        }
+    }
+};
+
 // Update the module.exports to include these new functions:
 module.exports = {
     signup,
@@ -394,5 +420,7 @@ module.exports = {
     createConversation,
     updateConversation,
     getAllConversations,
-    getConversationByConversationId
+    getConversationByConversationId,
+    requestPasswordReset,
+    resetPassword
 };
