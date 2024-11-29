@@ -72,9 +72,9 @@ const getSubscription = async (req, res) => {
 const createSubscription = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { id, plan, end_date, start_date, provider, billing_period } = req.body;
+        const { id, email, plan, end_date, start_date, provider, billing_period } = req.body;
 
-        const result = await supabaseService.createSubscription(userId, id, plan, end_date, start_date, provider, billing_period);
+        const result = await supabaseService.createSubscription(userId, id, email, plan, end_date, start_date, provider, billing_period);
 
         if (!result.success) {
             return res.status(400).json({ message: result.error });
@@ -379,7 +379,6 @@ const getConversationByConversationId = async (req, res) => {
 const requestPasswordReset = async (req, res) => {
     try {
         const { email } = req.body;
-        console.log(email);
         
         const result = await supabaseService.requestPasswordReset(email);
         res.status(200).json(result);

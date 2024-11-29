@@ -33,7 +33,7 @@ const {
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
 const { emailTransfer } = require("../config/email");
-const { getResetPasswordHtmlTemplate } = require('../config/email');
+const { getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
 
 const signupUser = async (first_name, last_name, email, password, phone_number) => {
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -93,7 +93,7 @@ const getSubscription = async (userId) => {
   return subscription;
 };
 
-const createSubscription = async (userId, id, plan, endDate, startDate, provider, billingPeriod) => {
+const createSubscription = async (userId, id, email, plan, endDate, startDate, provider, billingPeriod) => {
   try {
     const hasSubscription = await checkExistingSubscription(userId);
     if (hasSubscription) {
@@ -101,7 +101,18 @@ const createSubscription = async (userId, id, plan, endDate, startDate, provider
     }
 
     const subscription = await createSubscriptionForUserId(userId, id, plan, endDate, startDate, provider, billingPeriod);
-    return { success: true, data: subscription };
+    // Send email (pseudo-code)
+    let mailOptions = {
+      from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+      to: email,
+      subject: 'Subscription Success',
+      html: getSubscriptionSuccessTemplate(plan, endDate, startDate, billingPeriod),
+    };
+
+    await emailTransfer.sendMail(mailOptions);
+
+    return { success: true, message: "Subscription success email sent", data: subscription };
+
   } catch (error) {
     throw error;
   }
@@ -367,8 +378,6 @@ const requestPasswordReset = async (email) => {
       break;
   }
 
-  console.log(unit, value);
-
   // Check if value is a valid number
   if (isNaN(value)) {
     return { error: true, message: "Invalid expiration time format" };
@@ -406,7 +415,6 @@ const requestPasswordReset = async (email) => {
 const resetPassword = async (token, newPassword) => {
   // Find token in the database and check expiration (pseudo-code)
   const resetToken = await findPasswordResetToken(token);
-  console.log(resetToken, resetToken.expires);
 
   if (!resetToken || resetToken.expires < Date.now()) {
     // throw new Error("Token is invalid or has expired");
