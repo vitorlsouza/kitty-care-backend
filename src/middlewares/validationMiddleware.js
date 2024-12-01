@@ -66,6 +66,7 @@ const validateSignin = (req, res, next) => {
 
 const createSubscriptionSchema = Joi.object({
     id: Joi.any().optional(),
+    email: Joi.string().email(),
     plan: Joi.string().required().valid(...Object.values(PLANS)).messages({
         'any.required': 'Plan is required',
         'any.only': `Plan must be one of: ${Object.values(PLANS).join(', ')}`
