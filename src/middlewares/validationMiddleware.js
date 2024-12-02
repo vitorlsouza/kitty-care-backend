@@ -147,9 +147,7 @@ const validateCreateStripeSubscription = (req, res, next) => {
 };
 
 const createCatSchema = Joi.object({
-    name: Joi.string().messages({
-        'any.required': 'Name is required'
-    }),
+    name: Joi.string().messages(),
     goals: Joi.string().required().messages({
         'any.required': 'Goals are required'
     }),
@@ -330,6 +328,68 @@ const validateTestPayment = (req, res, next) => {
     next();
 };
 
+const recommendationsSchema = Joi.object({
+    name: Joi.string().messages(),
+    goals: Joi.string().required().messages({
+        'any.required': 'Goals are required'
+    }),
+    photo: Joi.string(),
+    issues_faced: Joi.string().required().messages({
+        'any.required': 'Issues faced are required'
+    }),
+    activity_level: Joi.string().required().messages({
+        'any.required': 'Activity level is required'
+    }),
+    gender: Joi.string().valid('Male', 'Female').required().messages({
+        'any.required': 'Gender is required',
+        'any.only': 'Gender must be either Male or Female'
+    }),
+    age: Joi.number().integer().required().messages({
+        'number.base': 'Age must be a number',
+        'number.integer': 'Age must be an integer',
+        'any.required': 'Age is required'
+    }),
+    country: Joi.string().optional().allow('').allow(null),
+    zipcode: Joi.string().optional().allow('').allow(null),
+    breed: Joi.string().required().messages({
+        'any.required': 'Breed is required'
+    }),
+    weight: Joi.number().positive().required().messages({
+        'number.positive': 'Weight must be a positive number',
+        'any.required': 'Weight is required'
+    }),
+    target_weight: Joi.number().positive().required().messages({
+        'number.positive': 'Target weight must be a positive number',
+        'any.required': 'Target weight is required'
+    }),
+    required_progress: Joi.string().required().messages({
+        'any.required': 'Required progress is required'
+    }),
+    check_in_period: Joi.string().valid('Daily', '3 Times a Week', 'Weekly').required().messages({
+        'any.only': 'Check-in period must be one of: Daily, 3 Times a Week, Weekly',
+        'any.required': 'Check-in period is required'
+    }),
+    training_days: Joi.string().required().messages({
+        'any.required': 'Training days is required'
+    }),
+    medical_conditions: Joi.string().allow('').allow(null),
+    medications: Joi.string().allow('').allow(null),
+    dietary_restrictions: Joi.string().allow('').allow(null),
+    medical_history: Joi.string().allow('').allow(null),
+    items: Joi.string().required().messages({
+        'any.required': 'Items are required'
+    })
+});
+
+const validateRecommendations = (req, res, next) => {
+    const { error } = recommendationsSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        const errors = error.details.map(detail => detail.message);
+        return res.status(400).json({ errors });
+    }
+    next();
+};
+
 module.exports = {
     validateInput,
     validateSignup,
@@ -343,5 +403,6 @@ module.exports = {
     validateUpdateConversation,
     validateTestPayment,
     validateCreateStripeSubscription,
-    validateResetPassword
+    validateResetPassword,
+    validateRecommendations
 };
