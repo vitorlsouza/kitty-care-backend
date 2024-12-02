@@ -31,7 +31,7 @@ exports.getRecommendations = async (req, res) => {
 
     try {
         const recommendations = await openaiService.getRecommendations(cat);
-        res.status(200).json({ message: recommendations });
+        res.status(200).json(recommendations);
     } catch (error) {
         console.error('Error in getRecommendations controller:', error);
         res.status(500).json({ message: 'An error occurred while processing the request' });
