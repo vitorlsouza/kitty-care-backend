@@ -32,7 +32,7 @@ const {
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
-const { emailTransfer } = require('../config/email')
+const { emailTransfer, getSubscriptionCancelTemplate } = require('../config/email')
 const { getSignUpConfirmationHtmlTemplate, getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
 
 const signupUser = async (first_name, last_name, email, password, phone_number) => {
@@ -142,30 +142,64 @@ const updateSubscription = async (subscriptionId, userId, plan, endDate, startDa
 };
 
 const deleteSubscription = async (subscriptionId, userId) => {
-  const result = await deleteSubscriptionForUserId(subscriptionId, userId);
+  try {
+    // Define the cancellation date (current date only, in YYYY-MM-DD format)
+    const endDate = new Date().toISOString().split("T")[0]; // Extracts just the date part
+    const user = await findUserById(userId); // Assuming this function retrieves user details
+    if (!user) {
+      return { success: false, error: "User not found", status: 404 };
+    }
 
-  if (result.error === "not_found") {
-    return { success: false, error: "Subscription not found", status: 404 };
-  } else if (result.error === "not_authorized") {
-    return {
-      success: false,
-      error: "User not authorized to delete this subscription",
-      status: 403,
+    const username = `${user.first_name} ${user.last_name}`;
+    const subscription = await getSubscriptionByUserId(userId);
+    if (!subscription) {
+      return { success: false, error: "Subscription not found", status: 404 };
+    }
+    // Send a cancellation email
+    const mailOptions = {
+      from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+      to: user.email,
+      subject: "Subscription Canceled",
+      html: getSubscriptionCancelTemplate(username, endDate, subscription.plan, subscription.billing_period),
     };
-  } else if (!result.success) {
+
+    await emailTransfer.sendMail(mailOptions);
+    console.log("Cancellation email sent successfully");
+
+    // Attempt to delete the subscription
+    const result = await deleteSubscriptionForUserId(subscriptionId, userId);
+
+    if (result.error === "not_found") {
+      return { success: false, error: "Subscription not found", status: 404 };
+    } else if (result.error === "not_authorized") {
+      return {
+        success: false,
+        error: "User not authorized to delete this subscription",
+        status: 403,
+      };
+    } else if (!result.success) {
+      return {
+        success: false,
+        error: "Failed to delete subscription",
+        status: 500,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Subscription deleted successfully",
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error during subscription deletion:", error);
     return {
       success: false,
-      error: "Failed to delete subscription",
+      error: "An error occurred during subscription deletion",
       status: 500,
     };
   }
-
-  return {
-    success: true,
-    message: "Subscription deleted successfully",
-    status: 200,
-  };
 };
+
 
 const getCatDetails = async (userId, catId) => {
   try {

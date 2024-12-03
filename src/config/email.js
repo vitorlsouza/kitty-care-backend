@@ -247,9 +247,103 @@ const getSubscriptionSuccessTemplate = (plan, endDate, startDate, billingPeriod)
     `;
 }
 
+const getSubscriptionCancelTemplate = (username, endDate, plan, billingPeriod) => {
+    const cliUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    const resubscribeLink = `${cliUrl}/priceselection`;
+
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta content="width=device-width, initial-scale=1" name="viewport">
+            <meta name="x-apple-disable-message-reformatting">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta content="telephone=no" name="format-detection">
+            <title>Subscription Canceled</title>
+        </head>
+
+        <body
+            style="width: 100%; height: 100%; margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, sans-serif;">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0"
+                style="background-color: #f5f5f5; margin: 0; padding: 0; width: 100%; height: 100%;">
+                <tr>
+                    <td align="center" style="padding: 20px;">
+                        <table style="max-width: 600px; width: 100%; text-align: center;">
+                            <!-- Header with Logo -->
+                            <tr>
+                                <td style="padding: 20px 0;">
+                                    <img src="https://flpayif.stripocdn.email/content/guids/CABINET_96e4ae211adee07311e554c4273ffe1ff40f2ad1112c01c052932c2ce82cf820/images/66ffff3c572c0bae3c48532a_image_12.png" alt="Logo" style="max-width: 200px; display: block; margin: 0 auto;">
+                                </td>
+                            </tr>
+                            <!-- Content -->
+                            <tr>
+                                <td>
+                                    <div
+                                        style="background: #ffffff; margin: 0 auto; border-radius: 10px; padding: 30px 60px; color: #333333; text-align: center;">
+                                        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 30px; color: #333333;">Subscription Canceled</h1>
+                                        <p style="text-align: center; margin: 30px auto; font-size: 16px;">
+                                            Hello ${username},
+                                        </p>
+                                        <p style="text-align: center; margin: 30px auto; font-size: 16px;">
+                                            We're sorry to see you go! We hope you come back in the future. Please take this email as confirmation that your subscription has been canceled.
+                                        </p>
+                                        <ul style="text-align: center; margin: 20px auto; padding-left: 0px; font-size: 16px; list-style: none;">
+                                            <li style="margin-bottom: 5px;">
+                                                <b>Subscription Plan:</b>
+                                                ${plan} - ${billingPeriod}
+                                            </li>
+                                            <li style="margin-bottom: 5px;">
+                                                <b>Cancellation Date:</b>
+                                                ${endDate}
+                                            </li>
+                                        </ul>
+                                        <p style="text-align: center; margin: 30px auto; font-size: 16px;">
+                                            If you ever decide to return, we’ll be here with open arms! You can restart your subscription anytime by visiting our website.
+                                        </p>
+                                        <a 
+                                            href="${resubscribeLink}" 
+                                            target="_blank" 
+                                            style="display: inline-block; background: #ff8706; color: #fff; text-decoration: none; padding: 10px 30px; font-size: 20px; border-radius: 6px; margin-bottom: 30px;">
+                                            Restart Subscription
+                                        </a>
+                                        <p style="text-align: center; margin: 30px auto; font-size: 16px;">
+                                            If you have any questions or need further assistance, feel free to reach out to our support team at support@kittycareapp.com. Thank you for being a part of KittyCare!
+                                        </p>
+                                        <p style="text-align: center; margin: 30px 0 0 0; font-size: 16px;">
+                                            Warm regards,
+                                        </p>
+                                        <p style="text-align: center; margin: 0; font-size: 16px;">
+                                            The KittyCare Team
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Footer -->
+                            <tr>
+                                <td style="padding: 20px; text-align: center; font-size: 12px; color: #cccccc;">
+                                    <p style="margin: 0;">
+                                        No longer want to receive these emails? 
+                                        <a href="#" style="color: #cccccc; text-decoration: underline;">Unsubscribe</a>.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+
+        </html>
+
+    `;
+}
+
 module.exports = {
     emailTransfer,
     getResetPasswordHtmlTemplate,
     getSubscriptionSuccessTemplate,
-    getSignUpConfirmationHtmlTemplate
+    getSignUpConfirmationHtmlTemplate,
+    getSubscriptionCancelTemplate
 }

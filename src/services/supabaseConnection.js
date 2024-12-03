@@ -281,7 +281,7 @@ module.exports.getConversationById = async (conversationId) => {
 module.exports.findUserById = async (userId) => {
   const { data, error } = await supabase
     .from('users')
-    .select('id')
+    .select('*')
     .eq('id', userId)
     .single();
 
