@@ -32,35 +32,50 @@ const {
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
-const { emailTransfer } = require("../config/email");
-const { getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
+const { emailTransfer } = require('../config/email')
+const { getSignUpConfirmationHtmlTemplate, getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
 
 const signupUser = async (first_name, last_name, email, password, phone_number) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-
   try {
-    const user = await createUserInDatabase(
-      first_name,
-      last_name,
-      email,
-      hashedPassword,
-      phone_number
-    );
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user in the database
+    const user = await createUserInDatabase(first_name, last_name, email, hashedPassword, phone_number);
     if (!user) {
       throw new Error("Failed to create user");
     }
 
-    const full_name = `${first_name} ${last_name}`;
-    const expiresIn = "1h";
-    const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
+    // Generate the JWT token
+    const tokenPayload = {
+      userId: user.id,
+      email: user.email,
+      full_name: `${first_name} ${last_name}`,
+    };
+    const tokenOptions = { expiresIn: "1h" };
+    const token = jwt.sign(tokenPayload, JWT_SECRET, tokenOptions);
 
-    return { token, expiresIn };
+    // Send a confirmation email
+    const mailOptions = {
+      from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+      to: email,
+      subject: "User Created Successfully",
+      html: getSignUpConfirmationHtmlTemplate(token),
+    };
+
+    // console.log(mailOptions);
+
+    await emailTransfer.sendMail(mailOptions);
+    console.log("Confirmation email sent successfully");
+
+    return { token, expiresIn: tokenOptions.expiresIn };
   } catch (error) {
-    if (
-      error.message.includes("duplicate key value violates unique constraint")
-    ) {
+    // Handle duplicate email error
+    if (error.message.includes("duplicate key value violates unique constraint")) {
       throw new Error("Email already exists");
     }
+
+    console.error("Error during signupUser:", error);
     throw error;
   }
 };
@@ -347,68 +362,42 @@ const getConversationByConversationId = async (userId, conversationId) => {
 };
 
 const requestPasswordReset = async (email) => {
-  const user = await findUserByEmail(email);
-  if (!user) {
-    return { error: true, message: "User not found" };
-  }
-
-  const expiresIn = "1h";
-  const full_name = user.first_name + user.last_name;
-  const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
-
-  // Calculate expiration timestamp
-  const unit = expiresIn.slice(-1);
-  let value = parseInt(expiresIn.slice(0, -1)); // Change `const` to `let`
-
-  switch (unit) {
-    case 'd':
-      value = value * 24 * 60 * 60 * 1000; // Days to milliseconds
-      break;
-    case 'h':
-      value = value * 60 * 60 * 1000; // Hours to milliseconds
-      break;
-    case 'm':
-      value = value * 60 * 1000; // Minutes to milliseconds
-      break;
-    case 's':
-      value = value * 1000; // Seconds to milliseconds
-      break;
-    default:
-      value = value * 60 * 60 * 1000; // Default to hours if no unit is found
-      break;
-  }
-
-  // Check if value is a valid number
-  if (isNaN(value)) {
-    return { error: true, message: "Invalid expiration time format" };
-  }
-
-  const expirationTime = new Date(Date.now() + value); // Calculate expiration time
-
-  // If expirationTime is invalid
-  if (isNaN(expirationTime.getTime())) {
-    return { error: true, message: "Invalid expiration time" };
-  }
-
-  // Save token and expiration in the database (pseudo-code)
-  await savePasswordResetToken(user.id, token, expirationTime);
-
-  // Send email (pseudo-code)
-  let mailOptions = {
-    from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
-    to: user.email,
-    subject: 'Password Reset',
-    html: getResetPasswordHtmlTemplate(token), // Generate the HTML using the token
-  };
-
-  // Send mail
   try {
-    let info = await emailTransfer.sendMail(mailOptions);
-    console.log("Email sent", info);
+    // Find the user by email
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return { error: true, message: "User not found" };
+    }
+
+    // Define expiration time and calculate the expiration timestamp
+    const expiresIn = 3600 * 1000; // 1 hour in milliseconds
+    const expirationTime = new Date(Date.now() + expiresIn);
+
+    // Generate the token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, full_name: `${user.first_name} ${user.last_name}` },
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // Save the token and expiration in the database
+    await savePasswordResetToken(user.id, token, expirationTime);
+
+    // Send the reset email
+    const mailOptions = {
+      from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+      to: user.email,
+      subject: "Password Reset",
+      html: getResetPasswordHtmlTemplate(token),
+    };
+
+    const info = await emailTransfer.sendMail(mailOptions);
+    console.log("Email sent successfully:", info);
+
     return { success: true, message: "Password reset email sent" };
   } catch (error) {
-    console.error('Error occurred: ', error);
-    return { error: true, message: "Failed to send email" };
+    console.error("Error in requestPasswordReset:", error);
+    return { error: true, message: "An error occurred while processing the request" };
   }
 };
 
