@@ -202,7 +202,7 @@ const getSubscriptionSuccessTemplate = (plan, endDate, startDate, billingPeriod)
                                             </li>
                                             <li style="margin:0 0 5px 0;">
                                                 <b>Upcoming Billing Date:</b>
-                                                ${startDate}
+                                                ${endDate}
                                             </li>
                                             <li style="margin:0 0 5px 0;">
                                                 <b>Amount to be Billed:</b>
@@ -210,7 +210,7 @@ const getSubscriptionSuccessTemplate = (plan, endDate, startDate, billingPeriod)
                                             </li>
                                         </ul>
                                         <p style="text-align: center; margin: 30px auto; font-size: 16px; width: 85%;">
-                                            You’re all set to enjoy everything KittyCare offers – from expert advice to personalized recommendations. We’ll send a reminder before your trial ends, and you’ll be automatically billed on ${startDate}.
+                                            You’re all set to enjoy everything KittyCare offers – from expert advice to personalized recommendations. We’ll send a reminder before your trial ends, and you’ll be automatically billed on ${endDate}.
                                         </p>
                                         <p style="text-align: center; margin: 0; font-size: 14px;">
                                             If you have any questions about your subscription, our support team is here to help.
