@@ -32,7 +32,7 @@ const {
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
-const { emailTransfer, getSubscriptionCancelTemplate } = require('../config/email')
+const { emailTransfer, getSubscriptionCancelTemplate } = require('../config/email');
 const { getSignUpConfirmationHtmlTemplate, getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
 
 const signupUser = async (first_name, last_name, email, password, phone_number) => {
@@ -114,20 +114,23 @@ const createSubscription = async (userId, id, email, plan, endDate, startDate, p
     if (hasSubscription) {
       return { success: false, error: 'User already has a subscription' };
     }
-
     const subscription = await createSubscriptionForUserId(userId, id, plan, endDate, startDate, provider, billingPeriod);
-    // Send email (pseudo-code)
-    let mailOptions = {
-      from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
-      to: email,
-      subject: 'Subscription Success',
-      html: getSubscriptionSuccessTemplate(plan, endDate, startDate, billingPeriod),
-    };
 
-    await emailTransfer.sendMail(mailOptions);
+    try {
+      let mailOptions = {
+        from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+        to: email,
+        subject: 'Subscription Success',
+        html: getSubscriptionSuccessTemplate(plan, endDate, startDate, billingPeriod),
+      };
+      await emailTransfer.sendMail(mailOptions);
 
-    return { success: true, message: "Subscription success email sent", data: subscription };
+      return { success: true, message: "Subscription success email sent", data: subscription };
+    } catch (error) {
+      console.error("Error sending subscription success email:", error);
 
+      return { success: true, message: "Subscription created, but failed to send success email", data: subscription };
+    }
   } catch (error) {
     throw error;
   }
@@ -441,7 +444,7 @@ const resetPassword = async (token, newPassword) => {
 
   if (!resetToken || resetToken.expires < Date.now()) {
     // throw new Error("Token is invalid or has expired");
-    return { success: false, message: "Token is invalid or has expired" }
+    return { success: false, message: "Token is invalid or has expired" };
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
