@@ -272,6 +272,7 @@ const validateChatMessage = (req, res, next) => {
 
 const openaiChatSchema = Joi.object({
     catId: Joi.number().integer().required(),
+    language: Joi.string().default('en'),
     messages: Joi.array().items(Joi.object({
         role: Joi.string().valid('user', 'assistant').required(),
         content: Joi.string().required(),

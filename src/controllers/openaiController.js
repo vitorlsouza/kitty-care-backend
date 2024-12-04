@@ -4,7 +4,7 @@ const supabaseService = require('../services/supabaseService');
 
 exports.chat = async (req, res) => {
     try {
-        const { catId, messages } = req.body;
+        const { catId, messages, language } = req.body;
         const userId = req.user.userId;
 
         // change each message to ONLY have a role and content
@@ -14,7 +14,7 @@ exports.chat = async (req, res) => {
         }));
 
         const catDetails = await supabaseService.getCatDetails(userId, catId);
-        const response = await openaiService.sendMessagesToOpenAI(catDetails, messagesWithRoleAndContent);
+        const response = await openaiService.sendMessagesToOpenAI(catDetails, messagesWithRoleAndContent, language);
 
         res.status(200).json({ message: response });
     } catch (error) {
