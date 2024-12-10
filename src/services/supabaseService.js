@@ -34,6 +34,7 @@ const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
 const { emailTransfer, getSubscriptionCancelTemplate } = require('../config/email');
 const { getSignUpConfirmationHtmlTemplate, getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
+const { createEventInKlaviyo, createUserInKlaviyo } = require("./klaviyoConnection");
 
 const signupUser = async (first_name, last_name, email, password, phone_number) => {
   try {
@@ -65,8 +66,12 @@ const signupUser = async (first_name, last_name, email, password, phone_number) 
 
     // console.log(mailOptions);
 
-    await emailTransfer.sendMail(mailOptions);
-    console.log("Confirmation email sent successfully");
+    // await emailTransfer.sendMail(mailOptions);
+    // console.log("Confirmation email sent successfully");
+    await createUserInKlaviyo({ email, first_name, last_name, phone_number });
+    await createEventInKlaviyo('Signed Up', email);
+    console.log("Created sign up event in Klaviyo");
+
 
     return { token, expiresIn: tokenOptions.expiresIn };
   } catch (error) {
@@ -96,6 +101,8 @@ const signinUser = async (email, password) => {
   const full_name = `${user.first_name} ${user.last_name}`;
   const expiresIn = "1h";
   const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
+  
+  await createEventInKlaviyo('login', email);
 
   return { token, expiresIn };
 };
@@ -124,8 +131,11 @@ const createSubscription = async (userId, id, email, plan, endDate, startDate, p
         html: getSubscriptionSuccessTemplate(plan, endDate, startDate, billingPeriod),
       };
       await emailTransfer.sendMail(mailOptions);
+      await createEventInKlaviyo('Created Subscription', email);
+      console.log("Created Subscription event in klaviyo");
 
       return { success: true, message: "Subscription success email sent", data: subscription };
+
     } catch (error) {
       console.error("Error sending subscription success email:", error);
 
@@ -168,6 +178,9 @@ const deleteSubscription = async (subscriptionId, userId) => {
 
     await emailTransfer.sendMail(mailOptions);
     console.log("Cancellation email sent successfully");
+
+    await createEventInKlaviyo('Canceled Subscription', user.email);
+    console.log("Created Subscription Cancel event in klaviyo");
 
     // Attempt to delete the subscription
     const result = await deleteSubscriptionForUserId(subscriptionId, userId);
@@ -228,6 +241,13 @@ const getCats = async (userId) => {
 const createCat = async (userId, catData) => {
   try {
     const cat = await createCatByUserId(userId, catData);
+    const user = await findUserById(userId); // Assuming this function retrieves user details
+    if (!user) {
+      return { success: false, error: "User not found", status: 404 };
+    }
+
+    await createEventInKlaviyo('Created the cat', user.email);
+    console.log("Created cat event in klaviyo");
     return cat;
   } catch (error) {
     throw error;
@@ -311,6 +331,13 @@ const handleChatMessage = async (conversation_id, user_id, content, role) => {
     }
 
     const newMessage = await createMessage(conversation_id, user_id, content, role);
+
+    const user = await findUserById(user_id); // Assuming this function retrieves user details
+    if (!user) {
+      return { success: false, error: "User not found", status: 404 };
+    }
+    await createEventInKlaviyo(`Wrote message: ${content}`, user.email);
+    console.log("Created message event in klaviyo");
 
     return {
       conversation_id: conversation_id,
@@ -431,6 +458,9 @@ const requestPasswordReset = async (email) => {
     const info = await emailTransfer.sendMail(mailOptions);
     console.log("Email sent successfully:", info);
 
+    await createEventInKlaviyo("Request reset password", user.email);
+    console.log("Created request resetting password event in klaviyo");
+
     return { success: true, message: "Password reset email sent" };
   } catch (error) {
     console.error("Error in requestPasswordReset:", error);
@@ -449,6 +479,9 @@ const resetPassword = async (token, newPassword) => {
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await updateUserPassword(resetToken.user_id, hashedPassword);
+
+  await createEventInKlaviyo("Password updated", user.email);
+  console.log("Created updated password event in klaviyo");
 
   // Optionally, delete the token after use
   await deletePasswordResetToken(token);
