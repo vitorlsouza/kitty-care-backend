@@ -1,4 +1,5 @@
 const stripeService = require('../services/stripeService');
+const paypalService = require('../services/paypalService')
 
 const createStripeSubscription = async (req, res) => {
     try {
@@ -46,7 +47,83 @@ const cancelStripeSubscription = async (req, res) => {
     }
 };
 
+const getPayPalListPlans = async (req, res) => {
+    try {
+        const result = await paypalService.getListPlans();
+
+        if (!result.success) {
+            return res.status(400).json({ error: result.message })
+        }
+
+        return res.status(200).json({ success: true, plans: result.plans });
+    } catch (error) {
+        console.error("Error in getting plans from paypal:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const createPayPalPlan = async (req, res) => {
+    try {
+        const { planPeriod } = req.body;
+
+        const result = await paypalService.createBillingPlan(planPeriod);
+
+        if (!result.success) {
+            return res.status(400).json({ error: result.message })
+        }
+
+        return res.status(200).json({ success: true, plan: result.plan });
+    } catch (error) {
+        console.error("Error in creating plan on paypal:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const createPayPalSubscription = async (req, res) => {
+    try {
+        const { planId, subscriberDetails } = req.body;
+        const returnUrl = `${process.env.CLIENT_URL}/paymentmethodV2`;
+        const cancelUrl = `${process.env.CLIENT_URL}/paymentmethodV2`;
+
+        const result = await paypalService.createSubscription(planId, subscriberDetails, returnUrl, cancelUrl);
+
+        if (!result.success) {
+            return res.status(400).json({ error: result.message })
+        }
+
+        return res.status(200).json({ success: true, subscription: result.subscription });
+    } catch (error) {
+        console.error("Error in creating plan on paypal:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const cancelPayPalSubscription = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ error: "Subscription ID is required" });
+        }
+
+        const result = await paypalService.cancelSubscription(id, reason = "Not satisfied with the service");
+
+        if (!result.success) {
+            return res.status(400).json({ error: result.message })
+        }
+
+        return res.status(200).json({ success: true, message: result.message });
+    } catch (error) {
+        console.error("Error in creating plan on paypal:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     createStripeSubscription,
-    cancelStripeSubscription
+    cancelStripeSubscription,
+    getPayPalListPlans,
+    createPayPalPlan,
+    createPayPalSubscription,
+    cancelPayPalSubscription
 }; 
