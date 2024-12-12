@@ -47,6 +47,36 @@ const cancelStripeSubscription = async (req, res) => {
     }
 };
 
+const getPayPalListProducts = async (req, res) => {
+    try {
+        const result = await paypalService.getPayPalListProducts();
+
+        if (!result.success) {
+            return res.status(400).json({ error: result.message })
+        }
+
+        return res.status(200).json({ success: true, products: result.products });
+    } catch (error) {
+        console.error("Error in getting products from paypal:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const createPayPalProduct = async (req, res) => {
+    try {
+        const result = await paypalService.createPayPalProduct();
+
+        if (!result.success) {
+            return res.status(400).json({ error: result.message })
+        }
+
+        return res.status(200).json({ success: true, product: result.product });
+    } catch (error) {
+        console.error("Error in creating product on paypal:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 const getPayPalListPlans = async (req, res) => {
     try {
         const result = await paypalService.getListPlans();
@@ -64,7 +94,7 @@ const getPayPalListPlans = async (req, res) => {
 
 const createPayPalPlan = async (req, res) => {
     try {
-        const { planPeriod } = req.body;
+        const { planPeriod } = req.body;      
 
         const result = await paypalService.createBillingPlan(planPeriod);
 
@@ -122,6 +152,8 @@ const cancelPayPalSubscription = async (req, res) => {
 module.exports = {
     createStripeSubscription,
     cancelStripeSubscription,
+    getPayPalListProducts,
+    createPayPalProduct,
     getPayPalListPlans,
     createPayPalPlan,
     createPayPalSubscription,

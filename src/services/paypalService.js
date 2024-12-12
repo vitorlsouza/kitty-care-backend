@@ -1,13 +1,13 @@
 const axios = require('axios');
 
 // Base URL for PayPal API
-const baseURL = "https://api-m.sandbox.paypal.com/v1/billing";
+const baseURL = "https://api-m.sandbox.paypal.com/v1";
 
 // Create an instance of axios with predefined headers and baseURL
 const paypalAPI = axios.create({
     baseURL: baseURL,
     headers: {
-        'Authorization': `Basic ${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`,
+        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`).toString('base64')}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Prefer': 'return=representation'
@@ -24,71 +24,126 @@ const PAYMENT_PREFERENCES = {
 // Common taxes
 const TAXES = { percentage: "0", inclusive: false };
 
-const MONTHLY_PLAN = {
-    product_id: "CAT_AI_SERVICE",
-    name: "Monthly Subscription Plan",
-    description: "Monthly plan with a 3-day free trial",
-    status: "ACTIVE",
-    billing_cycles: [
-        {
-            frequency: { interval_unit: "DAY", interval_count: 1 },
-            tenure_type: "TRIAL",
-            sequence: 1,
-            total_cycles: 3,
-            pricing_scheme: {
-                fixed_price: { value: "0", currency_code: "USD" }
+const MONTHLY_PLAN = (productId) => {
+    return {
+        product_id: productId,
+        name: "Monthly Subscription Plan",
+        description: "Monthly plan with a 3-day free trial",
+        status: "ACTIVE",
+        billing_cycles: [
+            {
+                frequency: { interval_unit: "DAY", interval_count: 1 },
+                tenure_type: "TRIAL",
+                sequence: 1,
+                total_cycles: 3,
+                pricing_scheme: {
+                    fixed_price: { value: "0", currency_code: "USD" }
+                }
+            },
+            {
+                frequency: { interval_unit: "MONTH", interval_count: 1 },
+                tenure_type: "REGULAR",
+                sequence: 2,
+                total_cycles: 12,
+                pricing_scheme: {
+                    fixed_price: { value: "49.99", currency_code: "USD" }
+                }
             }
-        },
-        {
-            frequency: { interval_unit: "MONTH", interval_count: 1 },
-            tenure_type: "REGULAR",
-            sequence: 2,
-            total_cycles: 12,
-            pricing_scheme: {
-                fixed_price: { value: "49.99", currency_code: "USD" }
-            }
-        }
-    ],
-    payment_preferences: PAYMENT_PREFERENCES,
-    taxes: TAXES
+        ],
+        payment_preferences: PAYMENT_PREFERENCES,
+        taxes: TAXES
+    }
 };
 
-const ANNUAL_PLAN = {
-    product_id: "CAT_AI_SERVICE",
-    name: "Annual Subscription Plan",
-    description: "Annual plan with a 7-day free trial",
-    status: "ACTIVE",
-    billing_cycles: [
-        {
-            frequency: { interval_unit: "DAY", interval_count: 1 },
-            tenure_type: "TRIAL",
-            sequence: 1,
-            total_cycles: 7,
-            pricing_scheme: {
-                fixed_price: { value: "0", currency_code: "USD" }
+const ANNUAL_PLAN = (productId) => {
+    return {
+        product_id: productId,
+        name: "Annual Subscription Plan",
+        description: "Annual plan with a 7-day free trial",
+        status: "ACTIVE",
+        billing_cycles: [
+            {
+                frequency: { interval_unit: "DAY", interval_count: 1 },
+                tenure_type: "TRIAL",
+                sequence: 1,
+                total_cycles: 7,
+                pricing_scheme: {
+                    fixed_price: { value: "0", currency_code: "USD" }
+                }
+            },
+            {
+                frequency: { interval_unit: "YEAR", interval_count: 1 },
+                tenure_type: "REGULAR",
+                sequence: 2,
+                total_cycles: 1,
+                pricing_scheme: {
+                    fixed_price: { value: "299.99", currency_code: "USD" }
+                }
             }
-        },
-        {
-            frequency: { interval_unit: "YEAR", interval_count: 1 },
-            tenure_type: "REGULAR",
-            sequence: 2,
-            total_cycles: 1,
-            pricing_scheme: {
-                fixed_price: { value: "299.99", currency_code: "USD" }
-            }
+        ],
+        payment_preferences: PAYMENT_PREFERENCES,
+        taxes: TAXES
+    }
+};
+
+//Function to get a PayPal products
+const getPayPalListProducts = async () => {
+    try {
+        const {total_items, products} = await paypalAPI.get("/catalogs/products?total_required=true");
+
+        return {
+            success: true,
+            products,
+            total_items,
+            message: "Successfully retrieved the list of products from PayPal"
         }
-    ],
-    payment_preferences: PAYMENT_PREFERENCES,
-    taxes: TAXES
+        
+    } catch (error) {
+        console.error("Error getting PayPal products:", error.response?.data || error.message);
+        return {
+            success: false,
+            message: error.response?.data?.message || "Failed to get products",
+        };
+    }   
+}
+
+// Function to create a PayPal product
+const createPayPalProduct = async () => {
+    const payload = {
+        name: "Cat care AI Service",
+        description: "Cat care AI service",
+        type: "SERVICE",
+        category: "SOFTWARE",
+    };
+
+    try {
+        paypalAPI.defaults.headers['PayPal-Request-Id'] = `PRODUCT-${Date.now()}`;
+
+        const response = await paypalAPI.post("/catalogs/products", payload);
+
+        return {
+            success: true,
+            product: response.data,
+            message: "Product created successfully",
+        };
+    } catch (error) {
+        console.error("Error creating PayPal product:", error.response?.data || error.message);
+        return {
+            success: false,
+            message: error.response?.data?.message || "Failed to create product",
+        };
+    }
 };
 
 // Service function to fetch the list of PayPal plans
 const getListPlans = async () => {
     try {
         // Fetch the list of plans
-        const response = await paypalAPI.get('/plans?sort_by=create_time&sort_order=desc');
+
+        const response = await paypalAPI.get('/billing/plans?sort_by=create_time&sort_order=desc');
         const plans = response.data.plans;
-        
+        console.log(plans);
+
         // Return success response
         return {
             success: true,
@@ -106,14 +161,14 @@ const getListPlans = async () => {
 };
 
 // Function to create a PayPal billing plan
-const createBillingPlan = async (planPeriod) => {
-    const planDetails = planPeriod === "Monthly" ? MONTHLY_PLAN : ANNUAL_PLAN;
+const createBillingPlan = async (planPeriod, productID) => {
 
-    paypalAPI.defaults.headers['PayPal-Request-Id'] = `PLAN-${Date.now()}`;
-
+    const planDetails = planPeriod === "Monthly" ? MONTHLY_PLAN(productID) : ANNUAL_PLAN(productID);
     try {
+        paypalAPI.defaults.headers['PayPal-Request-Id'] = `PLAN-${Date.now()}`;
+
         const response = await paypalAPI.post(
-            "/plans",
+            "/billing/plans",
             planDetails,
         );
         return {
@@ -136,7 +191,7 @@ const createSubscription = async (planId, subscriberDetails, returnUrl, cancelUr
         paypalAPI.defaults.headers['PayPal-Request-Id'] = `SUBSCRIPTION-${Date.now()}`;
 
         const response = await paypalAPI.post(
-            '/subscriptions',
+            '/billing/subscriptions',
             {
                 plan_id: planId,
                 start_time: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(), // Start in 1 hour
@@ -172,7 +227,7 @@ const createSubscription = async (planId, subscriberDetails, returnUrl, cancelUr
 
 const cancelSubscription = async (id, reason) => {
     try {
-        await paypalAPI.post(`subscriptions/${id}/cancel`, reason);
+        await paypalAPI.post(`/billing/subscriptions/${id}/cancel`, reason);
 
         return {
             success: true,
@@ -191,5 +246,7 @@ module.exports = {
     getListPlans,
     createBillingPlan,
     createSubscription,
-    cancelSubscription
+    cancelSubscription,
+    getPayPalListProducts,
+    createPayPalProduct
 };
