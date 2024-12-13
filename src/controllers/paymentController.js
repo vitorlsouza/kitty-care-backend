@@ -53,9 +53,9 @@ const getPayPalListProducts = async (req, res) => {
 
         if (!result.success) {
             return res.status(400).json({ error: result.message })
-        }
+        }        
 
-        return res.status(200).json({ success: true, products: result.products });
+        return res.status(200).json({ success: true, products: result.products, totalItems: result.total_items });
     } catch (error) {
         console.error("Error in getting products from paypal:", error);
         res.status(500).json({ error: error.message });
@@ -94,9 +94,9 @@ const getPayPalListPlans = async (req, res) => {
 
 const createPayPalPlan = async (req, res) => {
     try {
-        const { planPeriod } = req.body;      
+        const { planPeriod, productID } = req.body;      
 
-        const result = await paypalService.createBillingPlan(planPeriod);
+        const result = await paypalService.createBillingPlan(planPeriod, productID);
 
         if (!result.success) {
             return res.status(400).json({ error: result.message })

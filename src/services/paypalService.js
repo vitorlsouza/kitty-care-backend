@@ -89,22 +89,22 @@ const ANNUAL_PLAN = (productId) => {
 //Function to get a PayPal products
 const getPayPalListProducts = async () => {
     try {
-        const {total_items, products} = await paypalAPI.get("/catalogs/products?total_required=true");
+        const { data } = await paypalAPI.get("/catalogs/products?total_required=true");        
 
         return {
             success: true,
-            products,
-            total_items,
+            products: data.products,
+            total_items: data.total_items,
             message: "Successfully retrieved the list of products from PayPal"
         }
-        
+
     } catch (error) {
         console.error("Error getting PayPal products:", error.response?.data || error.message);
         return {
             success: false,
             message: error.response?.data?.message || "Failed to get products",
         };
-    }   
+    }
 }
 
 // Function to create a PayPal product
@@ -120,6 +120,9 @@ const createPayPalProduct = async () => {
         paypalAPI.defaults.headers['PayPal-Request-Id'] = `PRODUCT-${Date.now()}`;
 
         const response = await paypalAPI.post("/catalogs/products", payload);
+
+        console.log("22222222222222", response.data);
+        
 
         return {
             success: true,
@@ -164,6 +167,9 @@ const getListPlans = async () => {
 const createBillingPlan = async (planPeriod, productID) => {
 
     const planDetails = planPeriod === "Monthly" ? MONTHLY_PLAN(productID) : ANNUAL_PLAN(productID);
+
+    console.log("#$#$#$#$#$", productID, planPeriod, planDetails);
+
     try {
         paypalAPI.defaults.headers['PayPal-Request-Id'] = `PLAN-${Date.now()}`;
 
