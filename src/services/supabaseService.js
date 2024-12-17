@@ -29,6 +29,8 @@ const {
   updateUserPassword,
   deletePasswordResetToken,
   resetPasswordForEmail,
+  signInWithOTP,
+  verifyOTP,
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
@@ -492,12 +494,7 @@ const resetPassword = async (token, newPassword) => {
 
 const signinWithOTP = async (email) => {
   try {
-    const { data, error } = await supabaseConnection.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: false
-      }
-    });
+    const { data, error } = await signInWithOTP(email);
 
     if (error) {
       return { error: error.message };
@@ -513,11 +510,7 @@ const signinWithOTP = async (email) => {
 
 const verifyOTP = async (email, token, type) => {
   try {
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type
-    });
+    const { data, error } = await verifyOTP(email, token, type);
 
     if (error) {
       return { error: error.message };
@@ -540,16 +533,13 @@ const signupWithOTP = async (email, first_name, last_name, phone_number) => {
       return { error: 'Failed to create user' };
     }
 
-    // Then send the OTP
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: true,
-        data: {
-          first_name,
-          last_name,
-          phone_number
-        }
+    // Then send the OTP with user metadata
+    const { data, error } = await signInWithOTP(email, {
+      shouldCreateUser: true,
+      data: {
+        first_name,
+        last_name,
+        phone_number
       }
     });
 

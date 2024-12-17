@@ -416,3 +416,25 @@ module.exports.deletePasswordResetToken = async (token) => {
   if (error) throw error;
   return { success: true };
 };
+
+module.exports.signInWithOTP = async (email, options = {}) => {
+  const { data, error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: options.shouldCreateUser || false,
+      data: options.data || undefined
+    }
+  });
+
+  return { data, error };
+};
+
+module.exports.verifyOTP = async (email, token, type) => {
+  const { data, error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type
+  });
+
+  return { data, error };
+};
