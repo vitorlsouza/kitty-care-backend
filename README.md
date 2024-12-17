@@ -1264,3 +1264,34 @@ If you encounter any issues or have questions regarding the API, please reach ou
 ---
 
 Happy Coding! 🐱🚀
+
+### OTP Authentication Endpoints
+
+#### Sign In with OTP
+- **Endpoint**: `POST /api/supabase/signin-otp`
+- **Description**: Sends a one-time password to the user's email
+- **Request Body**:  ```json
+  {
+    "email": "user@example.com"
+  }  ```
+
+#### Verify OTP
+- **Endpoint**: `POST /api/supabase/verify-otp`
+- **Description**: Verifies the OTP and returns a session
+- **Request Body**:  ```json
+  {
+    "email": "user@example.com",
+    "token": "123456",
+    "type": "email"
+  }  ```
+
+#### Sign Up with OTP
+- **Endpoint**: `POST /api/supabase/signup-otp`
+- **Description**: Creates a new user and sends OTP
+- **Request Body**:  ```json
+  {
+    "email": "user@example.com",
+    "first_name": "John",
+    "last_name": "Doe",
+    "phone_number": "1234567890" // optional
+  }  ```

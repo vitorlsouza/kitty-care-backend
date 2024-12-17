@@ -1,12 +1,15 @@
 const express = require('express');
 const supabaseController = require('../controllers/supabaseController');
-const { validateSignup, validateSignin, validateCreateSubscription, validateUpdateSubscription, validateCreateCat, validateUpdateCat, validateChatMessage, validateUpdateConversation } = require('../middlewares/validationMiddleware');
+const { validateSignup, validateSignin, validateCreateSubscription, validateUpdateSubscription, validateCreateCat, validateUpdateCat, validateChatMessage, validateUpdateConversation, validateSigninOTP, validateVerifyOTP, validateSignupOTP } = require('../middlewares/validationMiddleware');
 const authenticateToken = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
 router.post('/signup', validateSignup, supabaseController.signup);
 router.post('/signin', validateSignin, supabaseController.signin);
+router.post('/signin-otp', validateSigninOTP, supabaseController.signinWithOTP);
+router.post('/verify-otp', validateVerifyOTP, supabaseController.verifyOTP);
+router.post('/signup-otp', validateSignupOTP, supabaseController.signupWithOTP);
 
 router.get('/subscriptions', authenticateToken, supabaseController.getSubscription);
 router.post('/subscriptions', authenticateToken, validateCreateSubscription, supabaseController.createSubscription);

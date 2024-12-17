@@ -35,6 +35,7 @@ const openaiService = require('./openaiService');
 const { emailTransfer, getSubscriptionCancelTemplate } = require('../config/email');
 const { getSignUpConfirmationHtmlTemplate, getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
 const { createEventInKlaviyo, createUserInKlaviyo } = require("./klaviyoConnection");
+const { supabase } = require('./supabaseConnection');
 
 const signupUser = async (first_name, last_name, email, password, phone_number) => {
   try {
@@ -101,7 +102,7 @@ const signinUser = async (email, password) => {
   const full_name = `${user.first_name} ${user.last_name}`;
   const expiresIn = "1h";
   const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
-  
+
   await createEventInKlaviyo('login', email);
 
   return { token, expiresIn };
@@ -489,6 +490,83 @@ const resetPassword = async (token, newPassword) => {
   return { success: true, message: "Password has been reset" };
 };
 
+const signinWithOTP = async (email) => {
+  try {
+    const { data, error } = await supabaseConnection.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: false
+      }
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    await createEventInKlaviyo('Requested OTP Login', email);
+    return { data };
+  } catch (error) {
+    console.error('Error in signinWithOTP:', error);
+    throw error;
+  }
+};
+
+const verifyOTP = async (email, token, type) => {
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    await createEventInKlaviyo('Verified OTP', email);
+    return data;
+  } catch (error) {
+    console.error('Error in verifyOTP:', error);
+    throw error;
+  }
+};
+
+const signupWithOTP = async (email, first_name, last_name, phone_number) => {
+  try {
+    // First create the user in your database
+    const user = await createUserInDatabase(first_name, last_name, email, null, phone_number);
+
+    if (!user) {
+      return { error: 'Failed to create user' };
+    }
+
+    // Then send the OTP
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: true,
+        data: {
+          first_name,
+          last_name,
+          phone_number
+        }
+      }
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    await createEventInKlaviyo('Signed Up with OTP', email);
+    await createUserInKlaviyo({ email, first_name, last_name, phone_number });
+
+    return { data };
+  } catch (error) {
+    console.error('Error in signupWithOTP:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   signupUser,
   signinUser,
@@ -514,4 +592,7 @@ module.exports = {
   uploadPhoto,
   requestPasswordReset,
   resetPassword,
+  signinWithOTP,
+  verifyOTP,
+  signupWithOTP
 };

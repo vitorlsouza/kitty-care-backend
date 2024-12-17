@@ -379,7 +379,7 @@ const getConversationByConversationId = async (req, res) => {
 const requestPasswordReset = async (req, res) => {
     try {
         const { email } = req.body;
-        
+
         const result = await supabaseService.requestPasswordReset(email);
         res.status(200).json(result);
     } catch (error) {
@@ -403,6 +403,63 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const signinWithOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const result = await supabaseService.signinWithOTP(email);
+
+        if (result.error) {
+            return res.status(400).json({ message: result.error });
+        }
+
+        res.status(200).json({
+            message: 'OTP sent successfully',
+            email: email
+        });
+    } catch (error) {
+        console.error('Signin OTP error:', error);
+        res.status(500).json({ message: 'An error occurred during OTP signin' });
+    }
+};
+
+const verifyOTP = async (req, res) => {
+    try {
+        const { email, token, type } = req.body;
+        const result = await supabaseService.verifyOTP(email, token, type);
+
+        if (result.error) {
+            return res.status(400).json({ message: result.error });
+        }
+
+        res.status(200).json({
+            session: result.session,
+            user: result.user
+        });
+    } catch (error) {
+        console.error('Verify OTP error:', error);
+        res.status(500).json({ message: 'An error occurred during OTP verification' });
+    }
+};
+
+const signupWithOTP = async (req, res) => {
+    try {
+        const { email, first_name, last_name, phone_number } = req.body;
+        const result = await supabaseService.signupWithOTP(email, first_name, last_name, phone_number);
+
+        if (result.error) {
+            return res.status(400).json({ message: result.error });
+        }
+
+        res.status(200).json({
+            message: 'OTP sent successfully',
+            email: email
+        });
+    } catch (error) {
+        console.error('Signup OTP error:', error);
+        res.status(500).json({ message: 'An error occurred during OTP signup' });
+    }
+};
+
 // Update the module.exports to include these new functions:
 module.exports = {
     signup,
@@ -423,5 +480,8 @@ module.exports = {
     getAllConversations,
     getConversationByConversationId,
     requestPasswordReset,
-    resetPassword
+    resetPassword,
+    signinWithOTP,
+    verifyOTP,
+    signupWithOTP
 };
