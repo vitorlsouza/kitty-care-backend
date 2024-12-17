@@ -64,8 +64,6 @@ const signupUser = async (first_name, last_name, email, password, phone_number) 
       html: getSignUpConfirmationHtmlTemplate(token),
     };
 
-    // console.log(mailOptions);
-
     // await emailTransfer.sendMail(mailOptions);
     // console.log("Confirmation email sent successfully");
     await createUserInKlaviyo({ email, first_name, last_name, phone_number });

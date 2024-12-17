@@ -119,10 +119,7 @@ const createPayPalProduct = async () => {
     try {
         paypalAPI.defaults.headers['PayPal-Request-Id'] = `PRODUCT-${Date.now()}`;
 
-        const response = await paypalAPI.post("/catalogs/products", payload);
-
-        console.log("22222222222222", response.data);
-        
+        const response = await paypalAPI.post("/catalogs/products", payload);        
 
         return {
             success: true,
@@ -145,8 +142,7 @@ const getListPlans = async () => {
 
         const response = await paypalAPI.get('/billing/plans?sort_by=create_time&sort_order=desc');
         const plans = response.data.plans;
-        console.log(plans);
-
+        
         // Return success response
         return {
             success: true,
@@ -167,8 +163,6 @@ const getListPlans = async () => {
 const createBillingPlan = async (planPeriod, productID) => {
 
     const planDetails = planPeriod === "Monthly" ? MONTHLY_PLAN(productID) : ANNUAL_PLAN(productID);
-
-    console.log("#$#$#$#$#$", productID, planPeriod, planDetails);
 
     try {
         paypalAPI.defaults.headers['PayPal-Request-Id'] = `PLAN-${Date.now()}`;
