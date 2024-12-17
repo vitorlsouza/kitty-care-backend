@@ -429,7 +429,7 @@ module.exports.signInWithOTP = async (email, options = {}) => {
   return { data, error };
 };
 
-module.exports.verifyOTP = async (email, token, type) => {
+module.exports.verifyOTPFromSupabase = async (email, token, type) => {
   const { data, error } = await supabase.auth.verifyOtp({
     email,
     token,

@@ -30,7 +30,7 @@ const {
   deletePasswordResetToken,
   resetPasswordForEmail,
   signInWithOTP,
-  verifyOTP,
+  verifyOTPFromSupabase,
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
@@ -510,7 +510,7 @@ const signinWithOTP = async (email) => {
 
 const verifyOTP = async (email, token, type) => {
   try {
-    const { data, error } = await verifyOTP(email, token, type);
+    const { data, error } = await verifyOTPFromSupabase(email, token, type);
 
     if (error) {
       return { error: error.message };
