@@ -160,9 +160,10 @@ const getCats = async (req, res) => {
 const createCat = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { photo, ...catData } = req.body;
+        const userEmail = req.user.email;
 
-        const cat = await supabaseService.createCat(userId, catData);
+        const { photo, ...catData } = req.body;
+        const cat = await supabaseService.createCat(userId, userEmail, catData);
 
         const aiRecommendations = await openaiService.getRecommendations(cat);
         const updatedCat = await supabaseService.updateCatRecommendations(

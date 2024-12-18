@@ -241,15 +241,11 @@ const getCats = async (userId) => {
   }
 };
 
-const createCat = async (userId, catData) => {
+const createCat = async (userId, userEmail, catData) => {
   try {
     const cat = await createCatByUserId(userId, catData);
-    const user = await findUserById(userId); // Assuming this function retrieves user details
-    if (!user) {
-      return { success: false, error: "User not found", status: 404 };
-    }
 
-    await createEventInKlaviyo('Created the cat', user.email);
+    await createEventInKlaviyo('Created the cat', userEmail);
     console.log("Created cat event in klaviyo");
     return cat;
   } catch (error) {
