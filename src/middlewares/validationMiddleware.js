@@ -424,7 +424,8 @@ const signupOTPSchema = Joi.object({
         'string.empty': 'Last name cannot be empty',
         'any.required': 'Last name is required'
     }),
-    phone_number: Joi.string().optional()
+    phone_number: Joi.string().optional(),
+    otp: Joi.string().optional()
 });
 
 const validateSigninOTP = (req, res, next) => {
