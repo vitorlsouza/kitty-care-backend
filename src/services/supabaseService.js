@@ -538,13 +538,16 @@ const signupWithOTP = async (email, first_name, last_name, phone_number) => {
         phone_number
       }
     });
-
     if (error) {
       return { error: error.message };
     }
 
-    await createEventInKlaviyo('Signed Up with OTP', email);
-    await createUserInKlaviyo({ email, first_name, last_name, phone_number });
+    try {
+      await createEventInKlaviyo('Signed Up with OTP', email);
+      await createUserInKlaviyo({ email, first_name, last_name, phone_number });
+    } catch (error) {
+      console.error('Error in create event in klaviyo:', error);
+    }
 
     return { data };
   } catch (error) {
