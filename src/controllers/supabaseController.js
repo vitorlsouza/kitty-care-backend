@@ -446,7 +446,6 @@ const signupWithOTP = async (req, res) => {
     try {
         const { email, first_name, last_name, phone_number } = req.body;
         const result = await supabaseService.signupWithOTP(email, first_name, last_name, phone_number);
-        console.log("controller signupWithOTP result", result);
 
         if (result.error) {
             return res.status(400).json({ message: result.error });
