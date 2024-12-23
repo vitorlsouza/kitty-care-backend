@@ -123,9 +123,18 @@ module.exports = {
   getCatsByUserId: async (userId) => {
     const { data, error } = await supabase
       .from('cats')
-      .select('id, name, photo, goals, issues_faced, required_progress, food_bowls, treats, playtime')
+      .select('*')
       .eq('user_id', userId);
 
+    if (error) throw error;
+    return data;
+  },
+  getCatByUserId: async (userId, catId) => {
+    const { data, error } = await supabase
+      .from('cats')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('id', catId)
     if (error) throw error;
     return data;
   },

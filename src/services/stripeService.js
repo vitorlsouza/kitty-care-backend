@@ -34,7 +34,7 @@ const createSubscription = async ({ name, email, paymentMethodId, priceId, trial
 };
 
 const cancelSubscription = async (subscriptionId) => {
-    try {
+    try {        
         const subscription = await stripe.subscriptions.cancel(subscriptionId);
 
         return {

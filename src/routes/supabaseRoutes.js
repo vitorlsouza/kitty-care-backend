@@ -17,6 +17,7 @@ router.put('/subscriptions/:id', authenticateToken, validateUpdateSubscription, 
 router.delete('/subscriptions/:id', authenticateToken, supabaseController.deleteSubscription);
 
 router.get('/cats', authenticateToken, supabaseController.getCats);
+router.get('/cat/:id', authenticateToken, supabaseController.getCatById);
 router.post('/cats', authenticateToken, validateCreateCat, supabaseController.createCat);
 router.put('/cats/:id', authenticateToken, validateUpdateCat, supabaseController.updateCat);
 router.delete('/cats/:id', authenticateToken, supabaseController.deleteCat);

@@ -25,7 +25,7 @@ const createStripeSubscription = async (req, res) => {
 };
 
 const cancelStripeSubscription = async (req, res) => {
-    try {
+    try {        
         const { id } = req.params;
         if (!id) {
             return res.status(400).json({ error: "Subscription ID is required" });

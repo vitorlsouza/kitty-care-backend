@@ -116,7 +116,9 @@ const updateSubscription = async (req, res) => {
 };
 
 const deleteSubscription = async (req, res) => {
+    
     try {
+        console.log("cancel #########");
         const { id } = req.params;
         const userId = req.user.userId;
 
@@ -143,6 +145,26 @@ const getCats = async (req, res) => {
     try {
         const userId = req.user.userId;
         const result = await supabaseService.getCats(userId);
+
+        if (result.message) {
+            return res.status(404).json(result);
+        }
+
+        res.json(result);
+    } catch (error) {
+        console.error("Get cats error:", error);
+        res
+            .status(500)
+            .json({ message: "An error occurred while fetching the cats" });
+    }
+};
+
+const getCatById = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const catId = req.params.id;
+
+        const result = await supabaseService.getCatById(userId, catId);
 
         if (result.message) {
             return res.status(404).json(result);
@@ -453,7 +475,8 @@ const signupWithOTP = async (req, res) => {
 
         res.status(200).json({
             message: 'OTP sent successfully',
-            email: email
+            email: email,
+            token: result.token
         });
     } catch (error) {
         console.error('Signup OTP error:', error);
@@ -484,5 +507,6 @@ module.exports = {
     resetPassword,
     signinWithOTP,
     verifyOTP,
-    signupWithOTP
+    signupWithOTP,
+    getCatById
 };
