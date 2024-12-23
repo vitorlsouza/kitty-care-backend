@@ -530,11 +530,11 @@ const verifyOTP = async (email, token, type) => {
 const signupWithOTP = async (email, first_name, last_name, phone_number) => {
   try {
     // First create the user in your database
-    // const user = await createUserInDatabase(first_name, last_name, email, null, phone_number);
+    const user = await createUserInDatabase(first_name, last_name, email, null, phone_number);
 
-    // if (!user) {
-    //   return { error: 'Failed to create user' };
-    // }
+    if (!user) {
+      return { error: 'Failed to create user' };
+    }
 
     // Then send the OTP with user metadata
     const { data, error } = await signInWithOTP(email, {
@@ -546,10 +546,8 @@ const signupWithOTP = async (email, first_name, last_name, phone_number) => {
       }
     });
 
-    console.log("data", data);
-
     const tokenPayload = {
-      userId: data.user.id,
+      userId: user.id,
       email: email,
       full_name: `${first_name} ${last_name}`,
     };
