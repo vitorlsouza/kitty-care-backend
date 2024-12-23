@@ -546,9 +546,11 @@ const signupWithOTP = async (email, first_name, last_name, phone_number) => {
       }
     });
 
+    console.log("data", data);
+
     const tokenPayload = {
-      userId: user.id,
-      email: user.email,
+      userId: data.user.id,
+      email: email,
       full_name: `${first_name} ${last_name}`,
     };
     const tokenOptions = { expiresIn: "1h" };
