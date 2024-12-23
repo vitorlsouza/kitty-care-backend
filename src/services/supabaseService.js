@@ -164,7 +164,7 @@ const deleteSubscription = async (subscriptionId, userId) => {
       return { success: false, error: "User not found", status: 404 };
     }
 
-    const username = `${user.first_name} ${user.last_name}`;
+    const username = `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
     const subscription = await getSubscriptionByUserId(userId);
     if (!subscription) {
       return { success: false, error: "Subscription not found", status: 404 };
