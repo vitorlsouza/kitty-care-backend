@@ -134,7 +134,7 @@ module.exports = {
       .from('cats')
       .select('*')
       .eq('user_id', userId)
-      .eq('id', catId)
+      .eq('id', catId);
     if (error) throw error;
     return data;
   },
@@ -273,14 +273,10 @@ module.exports = {
     return data;
   },
   findUserById: async (userId) => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    const { data: { user }, error } = await supabase.auth.admin.getUserById(userId);
 
     if (error) return null;
-    return data;
+    return user;
   },
   deleteConversationById: async (conversationId, userId) => {
     const { data: existingConversation, error: checkError } = await supabase

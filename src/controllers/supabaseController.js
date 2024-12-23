@@ -116,7 +116,7 @@ const updateSubscription = async (req, res) => {
 };
 
 const deleteSubscription = async (req, res) => {
-    
+
     try {
         console.log("cancel #########");
         const { id } = req.params;
