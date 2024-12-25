@@ -13,7 +13,6 @@ app.use(express.json());
 app.use('/api/openai', openaiRoutes);
 app.use('/api/supabase', supabaseRoutes);
 app.use('/api/payments', paymentRoutes);
-
 app.get('/', (req, res) => {
     res.send('Server is up and running! 😸');
 });

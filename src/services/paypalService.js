@@ -227,7 +227,8 @@ const createSubscription = async (planId, subscriberDetails, returnUrl, cancelUr
 
 const cancelSubscription = async (id, reason) => {
     try {
-        await paypalAPI.post(`/billing/subscriptions/${id}/cancel`, reason);
+        const data = { reason: reason }; // Ensure that data is sent as a proper JSON object
+        await paypalAPI.post(`/billing/subscriptions/${id}/cancel`, data); 
 
         return {
             success: true,
