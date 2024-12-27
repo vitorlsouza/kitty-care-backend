@@ -27,7 +27,7 @@ const createUserInKlaviyo = async ({ email, first_name, last_name, phone_number 
 
         // Check if klaviyoAPI.post automatically strings data
         const response = await klaviyoAPI.post('/profiles', JSON.stringify(profile));
-        console.log("############$$$$$$$$$", response.data.id);
+        console.log("############$$$$$$$$$", response.data.data.id);
         
 
         const subscribe_profile = {
@@ -38,7 +38,7 @@ const createUserInKlaviyo = async ({ email, first_name, last_name, phone_number 
                         "data": [
                             {
                                 "type": "profile",
-                                "id": response.data.id,
+                                "id": response.data.data.id,
                                 "attributes": {
                                     "email": email,
                                     "subscriptions": {
