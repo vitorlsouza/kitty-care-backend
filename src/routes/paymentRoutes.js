@@ -14,4 +14,4 @@ router.post('/paypal/plan', authenticateToken, paymentController.createPayPalPla
 router.post('/paypal/subscription', authenticateToken, paymentController.createPayPalSubscription);
 router.post('/paypal/subscription/:id', paymentController.cancelPayPalSubscription);
 
-module.exports = router; 
+module.exports = router;
