@@ -1,7 +1,8 @@
 const axios = require('axios');
 
 // Base URL for PayPal API
-const baseURL = "https://api-m.sandbox.paypal.com/v1";
+const baseURL = process.env.PAYPAL_BASE_URL || "https://api-m.sandbox.paypal.com/v1";
+console.log("paypal baseURL", baseURL);
 
 // Create an instance of axios with predefined headers and baseURL
 const paypalAPI = axios.create({
@@ -52,7 +53,7 @@ const MONTHLY_PLAN = (productId) => {
         ],
         payment_preferences: PAYMENT_PREFERENCES,
         taxes: TAXES
-    }
+    };
 };
 
 const ANNUAL_PLAN = (productId) => {
@@ -83,20 +84,20 @@ const ANNUAL_PLAN = (productId) => {
         ],
         payment_preferences: PAYMENT_PREFERENCES,
         taxes: TAXES
-    }
+    };
 };
 
 //Function to get a PayPal products
 const getPayPalListProducts = async () => {
     try {
-        const { data } = await paypalAPI.get("/catalogs/products?total_required=true");        
+        const { data } = await paypalAPI.get("/catalogs/products?total_required=true");
 
         return {
             success: true,
             products: data.products,
             total_items: data.total_items,
             message: "Successfully retrieved the list of products from PayPal"
-        }
+        };
 
     } catch (error) {
         console.error("Error getting PayPal products:", error.response?.data || error.message);
@@ -105,7 +106,7 @@ const getPayPalListProducts = async () => {
             message: error.response?.data?.message || "Failed to get products",
         };
     }
-}
+};
 
 // Function to create a PayPal product
 const createPayPalProduct = async () => {
@@ -119,7 +120,7 @@ const createPayPalProduct = async () => {
     try {
         paypalAPI.defaults.headers['PayPal-Request-Id'] = `PRODUCT-${Date.now()}`;
 
-        const response = await paypalAPI.post("/catalogs/products", payload);        
+        const response = await paypalAPI.post("/catalogs/products", payload);
 
         return {
             success: true,
@@ -142,7 +143,7 @@ const getListPlans = async () => {
 
         const response = await paypalAPI.get('/billing/plans?sort_by=create_time&sort_order=desc');
         const plans = response.data.plans;
-        
+
         // Return success response
         return {
             success: true,
@@ -228,7 +229,7 @@ const createSubscription = async (planId, subscriberDetails, returnUrl, cancelUr
 const cancelSubscription = async (id, reason) => {
     try {
         const data = { reason: reason }; // Ensure that data is sent as a proper JSON object
-        await paypalAPI.post(`/billing/subscriptions/${id}/cancel`, data); 
+        await paypalAPI.post(`/billing/subscriptions/${id}/cancel`, data);
 
         return {
             success: true,
@@ -241,7 +242,7 @@ const cancelSubscription = async (id, reason) => {
             message: error.response?.data?.message || "Failed to cancel subscription",
         };
     }
-}
+};
 
 module.exports = {
     getListPlans,
