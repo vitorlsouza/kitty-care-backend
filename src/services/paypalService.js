@@ -52,6 +52,7 @@ const paypalAPI = axios.create({
         'Prefer': 'return=representation'
     }
 });
+console.log("paypalAPI", paypalAPI);
 
 const PAYMENT_PREFERENCES = {
     auto_bill_outstanding: true,
@@ -180,6 +181,8 @@ const getListPlans = async () => {
         // Fetch the list of plans
 
         const response = await paypalAPI.get('/billing/plans?sort_by=create_time&sort_order=desc');
+        console.log("response", response.data);
+
         const plans = response.data.plans;
 
         // Return success response
