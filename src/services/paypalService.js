@@ -5,10 +5,48 @@ const baseURL = process.env.PAYPAL_BASE_URL || "https://api-m.sandbox.paypal.com
 console.log("paypal baseURL", baseURL);
 
 // Create an instance of axios with predefined headers and baseURL
+let auth = "Basic " + Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`).toString('base64');
+console.log("auth", auth);
+
+if (baseURL != "https://api-m.sandbox.paypal.com/v1") {
+    const axios = require('axios');
+    const qs = require('qs');
+
+    let data = qs.stringify({
+        'grant_type': 'client_credentials',
+        'ignoreCache': 'true',
+        'return_authn_schemes': 'true',
+        'return_client_metadata': 'true',
+        'return_unconsented_scopes': 'true'
+    });
+
+    let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://api-m.paypal.com/v1/oauth2/token',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': auth,
+            'Cookie': 'l7_az=ccg14.slc'
+        },
+        data: data
+    };
+
+    axios.request(config)
+        .then((response) => {
+            console.log(JSON.stringify(response.data));
+            auth = response.data.access_token;
+            console.log("changed auth", auth);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+}
+
 const paypalAPI = axios.create({
     baseURL: baseURL,
     headers: {
-        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`).toString('base64')}`,
+        'Authorization': auth,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Prefer': 'return=representation'
