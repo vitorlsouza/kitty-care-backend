@@ -27,8 +27,6 @@ const createUserInKlaviyo = async ({ email, first_name, last_name, phone_number 
 
         // Check if klaviyoAPI.post automatically strings data
         const response = await klaviyoAPI.post('/profiles', JSON.stringify(profile));
-        console.log("############$$$$$$$$$", response.data.data.id);
-
 
         const subscribe_profile = {
             "data": {
@@ -44,7 +42,7 @@ const createUserInKlaviyo = async ({ email, first_name, last_name, phone_number 
                                         "email": {
                                             "marketing": {
                                                 "consent": "SUBSCRIBED",
-                                                "consented_at": new Date().toISOString()
+                                                "consented_at": "2024-12-30T18:02:58Z" // new Date().toISOString().split('.')[0] + 'Z'   
                                             }
                                         }
                                     }
@@ -53,15 +51,8 @@ const createUserInKlaviyo = async ({ email, first_name, last_name, phone_number 
                             }
                         ]
                     },
-                    "custom_source": "Sign Up Form"
-                },
-                "relationships": {
-                    "list": {
-                        "data": {
-                            "type": "list",
-                            "id": "WZHkYJ"
-                        }
-                    }
+                    "custom_source": "Sign Up Form",
+                    "historical_import": true
                 }
             }
         };
