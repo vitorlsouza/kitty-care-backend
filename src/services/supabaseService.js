@@ -525,7 +525,7 @@ const verifyOTP = async (email, token, type) => {
       console.error('Error in create event in klaviyo:', error);
     }
 
-    return { data };
+    return data;
   } catch (error) {
     console.error('Error in verifyOTP:', error);
     throw error;
