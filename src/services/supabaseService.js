@@ -519,7 +519,12 @@ const verifyOTP = async (email, token, type) => {
       return { error: error.message };
     }
 
-    await createEventInKlaviyo('Verified OTP', email);
+    try {
+      await createEventInKlaviyo('Verified OTP', email);
+    } catch (error) {
+      console.error('Error in create event in klaviyo:', error);
+    }
+
     return data;
   } catch (error) {
     console.error('Error in verifyOTP:', error);
@@ -529,15 +534,8 @@ const verifyOTP = async (email, token, type) => {
 
 const signupWithOTP = async (email, first_name, last_name, phone_number) => {
   try {
-    // First create the user in your database
-    const user = await createUserInDatabase(first_name, last_name, email, null, phone_number);
-
-    if (!user) {
-      return { error: 'Failed to create user' };
-    }
-
     // Then send the OTP with user metadata
-    const { data, error } = await signInWithOTP(email, {
+    let { data, error } = await signInWithOTP(email, {
       shouldCreateUser: true,
       data: {
         first_name,
@@ -545,14 +543,6 @@ const signupWithOTP = async (email, first_name, last_name, phone_number) => {
         phone_number
       }
     });
-
-    const tokenPayload = {
-      userId: user.id,
-      email: email,
-      full_name: `${first_name} ${last_name}`,
-    };
-    const tokenOptions = { expiresIn: "1h" };
-    const token = jwt.sign(tokenPayload, JWT_SECRET, tokenOptions);
 
     if (error) {
       return { error: error.message };
@@ -565,7 +555,7 @@ const signupWithOTP = async (email, first_name, last_name, phone_number) => {
       console.error('Error in create event in klaviyo:', error);
     }
 
-    return { token, data };
+    return data;
   } catch (error) {
     console.error('Error in signupWithOTP:', error);
     throw error;
