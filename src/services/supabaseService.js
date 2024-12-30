@@ -519,7 +519,11 @@ const verifyOTP = async (email, token, type) => {
       return { error: error.message };
     }
 
-    await createEventInKlaviyo('Verified OTP', email);
+    try {
+      await createEventInKlaviyo('Verified OTP', email);
+    } catch (error) {
+      console.error('Error in create event in klaviyo:', error);
+    }
 
     return { data };
   } catch (error) {
