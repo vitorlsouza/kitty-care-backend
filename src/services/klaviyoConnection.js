@@ -28,7 +28,7 @@ const createUserInKlaviyo = async ({ email, first_name, last_name, phone_number 
         // Check if klaviyoAPI.post automatically strings data
         const response = await klaviyoAPI.post('/profiles', JSON.stringify(profile));
         console.log("############$$$$$$$$$", response.data.data.id);
-        
+
 
         const subscribe_profile = {
             "data": {
@@ -38,20 +38,22 @@ const createUserInKlaviyo = async ({ email, first_name, last_name, phone_number 
                         "data": [
                             {
                                 "type": "profile",
-                                "id": response.data.data.id,
                                 "attributes": {
                                     "email": email,
                                     "subscriptions": {
                                         "email": {
                                             "marketing": {
-                                                "consent": "SUBSCRIBED"
+                                                "consent": "SUBSCRIBED",
+                                                "consented_at": new Date().toISOString()
                                             }
-                                        },
+                                        }
                                     }
-                                }
+                                },
+                                "id": response.data.data.id
                             }
                         ]
-                    }
+                    },
+                    "custom_source": "Sign Up Form"
                 },
                 "relationships": {
                     "list": {
@@ -62,7 +64,7 @@ const createUserInKlaviyo = async ({ email, first_name, last_name, phone_number 
                     }
                 }
             }
-        }
+        };
 
         await klaviyoAPI.post('/profile-subscription-bulk-create-jobs', JSON.stringify(subscribe_profile));
 
