@@ -2,7 +2,8 @@ const { createClient } = require('@supabase/supabase-js');
 const { SUPABASE_URL, SUPABASE_ANON_KEY } = require('../config/config');
 
 // Create the Supabase client
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient("https://bfdyxkieasigvmcmbymp.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmZHl4a2llYXNpZ3ZtY21ieW1wIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMDk0OTA0MiwiZXhwIjoyMDQ2NTI1MDQyfQ.QIwPwC3ex2B5inzQDQy-QZWHPtrXaItc9dqPsPskGz0");
 
 // Export both the client and other functions
 module.exports = {
