@@ -176,9 +176,8 @@ const createCatSchema = Joi.object({
         'number.positive': 'Weight must be a positive number',
         'any.required': 'Weight is required'
     }),
-    target_weight: Joi.number().positive().required().messages({
+    target_weight: Joi.number().positive().messages({
         'number.positive': 'Target weight must be a positive number',
-        'any.required': 'Target weight is required'
     }),
     required_progress: Joi.string().required().messages({
         'any.required': 'Required progress is required'
