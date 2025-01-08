@@ -284,7 +284,7 @@ const updateCat = async (catId, userId, catData) => {
   }
 
   // Check if we need to update AI recommendations
-  if (catData.weight || catData.target_weight || catData.activity_level) {
+  if (catData.weight || catData.activity_level) {
     const aiRecommendations = await openaiService.getRecommendations(updatedCat);
     const finalUpdatedCat = await updateCatRecommendationsByCatId(catId, aiRecommendations);
     return finalUpdatedCat;

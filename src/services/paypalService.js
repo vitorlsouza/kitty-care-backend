@@ -2,11 +2,9 @@ const axios = require('axios');
 
 // Base URL for PayPal API
 const baseURL = process.env.PAYPAL_BASE_URL || "https://api-m.sandbox.paypal.com/v1";
-console.log("paypal baseURL", baseURL);
 
 // Create an instance of axios with predefined headers and baseURL
 let auth = "Basic " + Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`).toString('base64');
-console.log("auth", auth);
 
 if (baseURL != "https://api-m.sandbox.paypal.com/v1") {
     const axios = require('axios');
@@ -34,9 +32,7 @@ if (baseURL != "https://api-m.sandbox.paypal.com/v1") {
 
     axios.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
             auth = response.data.access_token;
-            console.log("changed auth", auth);
         })
         .catch((error) => {
             console.log(error);
@@ -52,7 +48,6 @@ const paypalAPI = axios.create({
         'Prefer': 'return=representation'
     }
 });
-console.log("paypalAPI", paypalAPI);
 
 const PAYMENT_PREFERENCES = {
     auto_bill_outstanding: true,
@@ -181,7 +176,6 @@ const getListPlans = async () => {
         // Fetch the list of plans
 
         const response = await paypalAPI.get('/billing/plans?sort_by=create_time&sort_order=desc');
-        console.log("response", response.data);
 
         const plans = response.data.plans;
 
