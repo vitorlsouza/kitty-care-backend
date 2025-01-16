@@ -13,9 +13,6 @@ const authenticateToken = async (req, res, next) => {
     try {
         // First try to verify if it's a Supabase session token
         const { data, error } = await supabase.auth.getUser(token);
-        if (error) {
-            throw new Error('Invalid token');
-        }
 
         if (data?.user) {
             // If it's a valid Supabase token, set the user info
