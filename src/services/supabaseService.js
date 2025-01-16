@@ -94,7 +94,7 @@ const signinUser = async (email, password) => {
   }
 
   const full_name = `${user.first_name} ${user.last_name}`;
-  const expiresIn = "1h";
+  const expiresIn = "7d";
   const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
 
   await createEventInKlaviyo('login', email);
