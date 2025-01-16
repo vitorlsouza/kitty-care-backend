@@ -8,33 +8,58 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 module.exports = {
   supabase,  // Export the client directly
   createUserInDatabase: async (first_name, last_name, email, hashedPassword, phone_number = null) => {
-    const { data, error } = await supabase.from('users').insert({
-      first_name: first_name,
-      last_name: last_name,
+    // const { data, error } = await supabase.from('users').insert({
+    //   first_name: first_name,
+    //   last_name: last_name,
+    //   email: email,
+    //   password: hashedPassword,
+    //   phone_number: phone_number
+    // }).select().single();
+
+    const { data, error } = await supabase.auth.admin.createUser({
       email: email,
       password: hashedPassword,
-      phone_number: phone_number
-    }).select().single();
+      email_confirm: true,
+      user_metadata: {
+        first_name: first_name,
+        last_name: last_name,
+        phone_number: phone_number
+      }
+    });
+
+    console.log("Supabase connection createUserInDatabase", data);
 
     if (error) throw error;
     return data;
   },
+  signinUserInDatabase: async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+    console.log("Supabase connection signinUserInDatabase", data);
+    console.log("Supabase connection signinUserInDatabase error", error);
+
+    return data;
+  },
   findUserByEmail: async (email) => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single();
+    // const { data, error } = await supabase
+    //   .from('users')
+    //   .select('*')
+    //   .eq('email', email)
+    //   .single();
+    const { data, error } = await supabase.auth.admin.getUserByEmail(email);
 
     if (error) return null;
     return data;
   },
   getSubscriptionByUserId: async (userId) => {
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .select('id, plan, end_date, start_date, provider, billing_period')
-      .eq('user_id', userId)
-      .single();
+    // const { data, error } = await supabase
+    //   .from('subscriptions')
+    //   .select('id, plan, end_date, start_date, provider, billing_period')
+    //   .eq('user_id', userId)
+    //   .single();
+    const { data, error } = await supabase.auth.admin.getUserById(userId);
 
     if (error) return null;
     return data;

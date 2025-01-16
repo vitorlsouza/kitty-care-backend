@@ -31,6 +31,7 @@ const {
   resetPasswordForEmail,
   signInWithOTP,
   verifyOTPFromSupabase,
+  signinUserInDatabase,
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
@@ -56,23 +57,25 @@ const signupUser = async (first_name, last_name, email, password, phone_number) 
       email: user.email,
       full_name: `${first_name} ${last_name}`,
     };
-    const tokenOptions = { expiresIn: "1h" };
+    const tokenOptions = { expiresIn: "7d" };
     const token = jwt.sign(tokenPayload, JWT_SECRET, tokenOptions);
 
     // Send a confirmation email
-    const mailOptions = {
-      from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
-      to: email,
-      subject: "User Created Successfully",
-      html: getSignUpConfirmationHtmlTemplate(token),
-    };
+    // const mailOptions = {
+    //   from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+    //   to: email,
+    //   subject: "User Created Successfully",
+    //   html: getSignUpConfirmationHtmlTemplate(token),
+    // };
 
     // await emailTransfer.sendMail(mailOptions);
-    // console.log("Confirmation email sent successfully");
-    await createUserInKlaviyo({ email, first_name, last_name, phone_number });
-    await createEventInKlaviyo('Signed Up', email);
-    console.log("Created sign up event in Klaviyo");
-
+    try {
+      await createUserInKlaviyo({ email, first_name, last_name, phone_number });
+      await createEventInKlaviyo('Signed Up', email);
+      console.log("Created sign up event in Klaviyo");
+    } catch (error) {
+      console.error("Error in createUserInKlaviyo:", error);
+    }
 
     return { token, expiresIn: tokenOptions.expiresIn };
   } catch (error) {
@@ -87,23 +90,14 @@ const signupUser = async (first_name, last_name, email, password, phone_number) 
 };
 
 const signinUser = async (email, password) => {
-  const user = await findUserByEmail(email);
-  if (!user) {
-    // Instead of throwing an error, we'll return a specific message
-    return { error: "User not found" };
-  }
+  const user = await signinUserInDatabase(email, password);
+  console.log("User:--", user);
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    // Return a different message for incorrect password
-    return { error: "Incorrect password" };
-  }
+  // const full_name = `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
+  // const expiresIn = "1h";
+  // const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
 
-  const full_name = `${user.first_name} ${user.last_name}`;
-  const expiresIn = "1h";
-  const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
-
-  await createEventInKlaviyo('login', email);
+  // await createEventInKlaviyo('login', email);
 
   return { token, expiresIn };
 };
@@ -503,7 +497,7 @@ const signinWithOTP = async (email) => {
       return { error: error.message };
     }
 
-    await createEventInKlaviyo('Requested OTP Login', email);
+    // await createEventInKlaviyo('Requested OTP Login', email);
     return { data };
   } catch (error) {
     console.error('Error in signinWithOTP:', error);
