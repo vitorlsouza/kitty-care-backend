@@ -8,15 +8,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 module.exports = {
   supabase,  // Export the client directly
   createUserInDatabase: async (first_name, last_name, email, hashedPassword, phone_number = null) => {
-    // const { data, error } = await supabase.from('users').insert({
-    //   first_name: first_name,
-    //   last_name: last_name,
-    //   email: email,
-    //   password: hashedPassword,
-    //   phone_number: phone_number
-    // }).select().single();
+    // For the time being, we are using the supabase auth.admin.createUser method to create a user in the database.
+    // And are using the id from the auth.admin.createUser method to create a user in the database.
+    // Reason is supabase.auth.signInWithPassword method does not return the user data.
 
-    const { data, error } = await supabase.auth.admin.createUser({
+    let { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email: email,
       password: hashedPassword,
       email_confirm: true,
@@ -26,40 +22,42 @@ module.exports = {
         phone_number: phone_number
       }
     });
+    if (authError) throw authError;
 
-    console.log("Supabase connection createUserInDatabase", data);
+    let { data: userData, error: userError } = await supabase.from('users').insert({
+      id: authData.user.id,
+      first_name: first_name,
+      last_name: last_name,
+      email: email,
+      password: hashedPassword,
+      phone_number: phone_number
+    }).select().single();
+
+    if (userError) throw userError;
+    return userData;
+  },
+  signinUserInDatabase: async (email, password) => {
+    const { data, error } = await supabase.from('users').select('*').eq('email', email).eq('password', password).single();
 
     if (error) throw error;
     return data;
   },
-  signinUserInDatabase: async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
-    console.log("Supabase connection signinUserInDatabase", data);
-    console.log("Supabase connection signinUserInDatabase error", error);
-
-    return data;
-  },
   findUserByEmail: async (email) => {
-    // const { data, error } = await supabase
-    //   .from('users')
-    //   .select('*')
-    //   .eq('email', email)
-    //   .single();
-    const { data, error } = await supabase.auth.admin.getUserByEmail(email);
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
 
     if (error) return null;
     return data;
   },
   getSubscriptionByUserId: async (userId) => {
-    // const { data, error } = await supabase
-    //   .from('subscriptions')
-    //   .select('id, plan, end_date, start_date, provider, billing_period')
-    //   .eq('user_id', userId)
-    //   .single();
-    const { data, error } = await supabase.auth.admin.getUserById(userId);
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('id, plan, end_date, start_date, provider, billing_period')
+      .eq('user_id', userId)
+      .single();
 
     if (error) return null;
     return data;
