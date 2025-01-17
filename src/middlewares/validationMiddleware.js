@@ -182,10 +182,10 @@ const createCatSchema = Joi.object({
     required_progress: Joi.string().required().messages({
         'any.required': 'Required progress is required'
     }),
-    check_in_period: Joi.string().valid('Daily', '3 Times a Week', 'Weekly').messages({
+    check_in_period: Joi.string().allow('').allow(null).valid('Daily', '3 Times a Week', 'Weekly').messages({
         'any.only': 'Check-in period must be one of: Daily, 3 Times a Week, Weekly',
     }),
-    training_days: Joi.string().messages(),
+    training_days: Joi.string().allow('').allow(null).messages(),
     medical_conditions: Joi.string().allow('').allow(null),
     medications: Joi.string().allow('').allow(null),
     dietary_restrictions: Joi.string().allow('').allow(null),
@@ -232,8 +232,8 @@ const updateCatSchema = Joi.object({
     weight: Joi.number().positive(),
     target_weight: Joi.number().positive(),
     required_progress: Joi.string(),
-    check_in_period: Joi.string().valid('Daily', '3 Times a Week', 'Weekly'),
-    training_days: Joi.string(),
+    check_in_period: Joi.string().allow('').allow(null).valid('Daily', '3 Times a Week', 'Weekly'),
+    training_days: Joi.string().allow('').allow(null),
     medical_conditions: Joi.string().allow('').allow(null),
     medications: Joi.string().allow('').allow(null),
     dietary_restrictions: Joi.string().allow('').allow(null),
@@ -337,8 +337,7 @@ const recommendationsSchema = Joi.object({
     activity_level: Joi.string().required().messages({
         'any.required': 'Activity level is required'
     }),
-    gender: Joi.string().valid('Male', 'Female').required().messages({
-        'any.required': 'Gender is required',
+    gender: Joi.string().valid('male', 'female', 'boy', 'girl').messages({
         'any.only': 'Gender must be either Male or Female'
     }),
     age: Joi.number().integer().required().messages({
@@ -363,13 +362,10 @@ const recommendationsSchema = Joi.object({
     required_progress: Joi.string().required().messages({
         'any.required': 'Required progress is required'
     }),
-    check_in_period: Joi.string().valid('Daily', '3 Times a Week', 'Weekly').required().messages({
+    check_in_period: Joi.string().allow('').allow(null).valid('Daily', '3 Times a Week', 'Weekly').messages({
         'any.only': 'Check-in period must be one of: Daily, 3 Times a Week, Weekly',
-        'any.required': 'Check-in period is required'
     }),
-    training_days: Joi.string().required().messages({
-        'any.required': 'Training days is required'
-    }),
+    training_days: Joi.string().allow('').allow(null).messages(),
     medical_conditions: Joi.string().allow('').allow(null),
     medications: Joi.string().allow('').allow(null),
     dietary_restrictions: Joi.string().allow('').allow(null),
