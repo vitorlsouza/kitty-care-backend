@@ -8,13 +8,36 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 module.exports = {
   supabase,  // Export the client directly
   createUserInDatabase: async (first_name, last_name, email, hashedPassword, phone_number = null) => {
-    const { data, error } = await supabase.from('users').insert({
+    // For the time being, we are using the supabase auth.admin.createUser method to create a user in the database.
+    // And are using the id from the auth.admin.createUser method to create a user in the database.
+    // Reason is supabase.auth.signInWithPassword method does not return the user data.
+
+    let { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email: email,
+      password: hashedPassword,
+      email_confirm: true,
+      user_metadata: {
+        first_name: first_name,
+        last_name: last_name,
+        phone_number: phone_number
+      }
+    });
+    if (authError) throw authError;
+
+    let { data: userData, error: userError } = await supabase.from('users').insert({
+      id: authData.user.id,
       first_name: first_name,
       last_name: last_name,
       email: email,
       password: hashedPassword,
       phone_number: phone_number
     }).select().single();
+
+    if (userError) throw userError;
+    return userData;
+  },
+  signinUserInDatabase: async (email, password) => {
+    const { data, error } = await supabase.from('users').select('*').eq('email', email).eq('password', password).single();
 
     if (error) throw error;
     return data;

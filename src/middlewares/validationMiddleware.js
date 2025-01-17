@@ -178,17 +178,14 @@ const createCatSchema = Joi.object({
     }),
     target_weight: Joi.number().min(0).messages({
         'number.positive': 'Target weight must be a positive number',
-    }),    
+    }),
     required_progress: Joi.string().required().messages({
         'any.required': 'Required progress is required'
     }),
-    check_in_period: Joi.string().valid('Daily', '3 Times a Week', 'Weekly').required().messages({
+    check_in_period: Joi.string().valid('Daily', '3 Times a Week', 'Weekly').messages({
         'any.only': 'Check-in period must be one of: Daily, 3 Times a Week, Weekly',
-        'any.required': 'Check-in period is required'
     }),
-    training_days: Joi.string().required().messages({
-        'any.required': 'Training days is required'
-    }),
+    training_days: Joi.string().messages(),
     medical_conditions: Joi.string().allow('').allow(null),
     medications: Joi.string().allow('').allow(null),
     dietary_restrictions: Joi.string().allow('').allow(null),
@@ -227,7 +224,7 @@ const updateCatSchema = Joi.object({
     photo: Joi.any(),
     issues_faced: Joi.string().allow(''),
     activity_level: Joi.string(),
-    gender: Joi.string().valid('Male', 'Female'),
+    gender: Joi.string().valid('male', 'boy', 'girl', 'female'),
     age: Joi.number().integer(),
     country: Joi.string().optional().allow('').allow(null),
     zipcode: Joi.string().optional().allow('').allow(null),
@@ -362,7 +359,7 @@ const recommendationsSchema = Joi.object({
         'number.min': 'Target weight must be at least 0',
         'any.required': 'Target weight is required'
     }),
-    
+
     required_progress: Joi.string().required().messages({
         'any.required': 'Required progress is required'
     }),
