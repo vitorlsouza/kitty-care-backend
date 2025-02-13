@@ -158,7 +158,7 @@ const createCatSchema = Joi.object({
     activity_level: Joi.string().required().messages({
         'any.required': 'Activity level is required'
     }),
-    gender: Joi.string().valid('male', 'boy', 'girl', 'female').required().messages({
+    gender: Joi.string().valid('Male', 'Boy', 'Girl', 'Female').required().messages({
         'any.required': 'Gender is required',
         'any.only': 'Gender must be either male, boy, girl, or female'
     }),

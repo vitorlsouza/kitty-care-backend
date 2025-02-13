@@ -35,9 +35,9 @@ const {
 } = require("./supabaseConnection");
 const { JWT_SECRET } = require("../config/config");
 const openaiService = require('./openaiService');
-const { emailTransfer, getSubscriptionCancelTemplate } = require('../config/email');
-const { getSignUpConfirmationHtmlTemplate, getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
-const { createEventInKlaviyo, createUserInKlaviyo } = require("./klaviyoConnection");
+// const { emailTransfer, getSubscriptionCancelTemplate } = require('../config/email');
+// const { getSignUpConfirmationHtmlTemplate, getResetPasswordHtmlTemplate, getSubscriptionSuccessTemplate } = require('../config/email');
+// const { createEventInKlaviyo, createUserInKlaviyo } = require("./klaviyoConnection");
 const { supabase } = require('./supabaseConnection');
 
 const signupUser = async (first_name, last_name, email, password, phone_number) => {
@@ -61,8 +61,8 @@ const signupUser = async (first_name, last_name, email, password, phone_number) 
     const token = jwt.sign(tokenPayload, JWT_SECRET, tokenOptions);
 
     try {
-      await createUserInKlaviyo({ email, first_name, last_name, phone_number });
-      await createEventInKlaviyo('Signed Up', email);
+      // await createUserInKlaviyo({ email, first_name, last_name, phone_number });
+      // await createEventInKlaviyo('Signed Up', email);
       console.log("Created sign up event in Klaviyo");
     } catch (error) {
       console.error("Error in createUserInKlaviyo:", error);
@@ -97,7 +97,7 @@ const signinUser = async (email, password) => {
   const expiresIn = "7d";
   const token = jwt.sign({ userId: user.id, email: user.email, full_name: full_name }, JWT_SECRET, { expiresIn });
 
-  await createEventInKlaviyo('login', email);
+  // await createEventInKlaviyo('login', email);
 
   return { token, expiresIn };
 };
@@ -119,14 +119,14 @@ const createSubscription = async (userId, id, email, plan, endDate, startDate, p
     const subscription = await createSubscriptionForUserId(userId, id, plan, endDate, startDate, provider, billingPeriod);
 
     try {
-      let mailOptions = {
-        from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
-        to: email,
-        subject: 'Subscription Success',
-        html: getSubscriptionSuccessTemplate(plan, endDate, startDate, billingPeriod),
-      };
-      await emailTransfer.sendMail(mailOptions);
-      await createEventInKlaviyo('Created Subscription', email);
+      // let mailOptions = {
+      //   from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+      //   to: email,
+      //   subject: 'Subscription Success',
+      //   html: getSubscriptionSuccessTemplate(plan, endDate, startDate, billingPeriod),
+      // };
+      // await emailTransfer.sendMail(mailOptions);
+      // await createEventInKlaviyo('Created Subscription', email);
       console.log("Created Subscription event in klaviyo");
 
       return { success: true, message: "Subscription success email sent", data: subscription };
@@ -164,17 +164,17 @@ const deleteSubscription = async (subscriptionId, userId) => {
       return { success: false, error: "Subscription not found", status: 404 };
     }
     // Send a cancellation email
-    const mailOptions = {
-      from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
-      to: user.email,
-      subject: "Subscription Canceled",
-      html: getSubscriptionCancelTemplate(username, endDate, subscription.plan, subscription.billing_period),
-    };
+    // const mailOptions = {
+    //   from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+    //   to: user.email,
+    //   subject: "Subscription Canceled",
+    //   html: getSubscriptionCancelTemplate(username, endDate, subscription.plan, subscription.billing_period),
+    // };
 
-    await emailTransfer.sendMail(mailOptions);
+    // await emailTransfer.sendMail(mailOptions);
     console.log("Cancellation email sent successfully");
 
-    await createEventInKlaviyo('Canceled Subscription', user.email);
+    // await createEventInKlaviyo('Canceled Subscription', user.email);
     console.log("Created Subscription Cancel event in klaviyo");
 
     // Attempt to delete the subscription
@@ -246,7 +246,7 @@ const createCat = async (userId, userEmail, catData) => {
   try {
     const cat = await createCatByUserId(userId, catData);
 
-    await createEventInKlaviyo('Created the cat', userEmail);
+    // await createEventInKlaviyo('Created the cat', userEmail);
     console.log("Created cat event in klaviyo");
     return cat;
   } catch (error) {
@@ -336,7 +336,7 @@ const handleChatMessage = async (conversation_id, user_id, content, role) => {
     if (!user) {
       return { success: false, error: "User not found", status: 404 };
     }
-    await createEventInKlaviyo(`Wrote message: ${content}`, user.email);
+    // await createEventInKlaviyo(`Wrote message: ${content}`, user.email);
     console.log("Created message event in klaviyo");
 
     return {
@@ -448,17 +448,17 @@ const requestPasswordReset = async (email) => {
     await savePasswordResetToken(user.id, token, expirationTime);
 
     // Send the reset email
-    const mailOptions = {
-      from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
-      to: user.email,
-      subject: "Password Reset",
-      html: getResetPasswordHtmlTemplate(token),
-    };
+    // const mailOptions = {
+    //   from: `"Kitty Care App" <${process.env.SMTP_USERNAME}>`,
+    //   to: user.email,
+    //   subject: "Password Reset",
+    //   html: getResetPasswordHtmlTemplate(token),
+    // };
 
-    const info = await emailTransfer.sendMail(mailOptions);
+    // const info = await emailTransfer.sendMail(mailOptions);
     console.log("Email sent successfully:", info);
 
-    await createEventInKlaviyo("Request reset password", user.email);
+    // await createEventInKlaviyo("Request reset password", user.email);
     console.log("Created request resetting password event in klaviyo");
 
     return { success: true, message: "Password reset email sent" };
@@ -480,7 +480,7 @@ const resetPassword = async (token, newPassword) => {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await updateUserPassword(resetToken.user_id, hashedPassword);
 
-  await createEventInKlaviyo("Password updated", user.email);
+  // await createEventInKlaviyo("Password updated", user.email);
   console.log("Created updated password event in klaviyo");
 
   // Optionally, delete the token after use
@@ -513,11 +513,11 @@ const verifyOTP = async (email, token, type) => {
       return { error: error.message };
     }
 
-    try {
-      await createEventInKlaviyo('Verified OTP', email);
-    } catch (error) {
-      console.error('Error in create event in klaviyo:', error);
-    }
+    // try {
+    //   await createEventInKlaviyo('Verified OTP', email);
+    // } catch (error) {
+    //   console.error('Error in create event in klaviyo:', error);
+    // }
 
     return data;
   } catch (error) {
@@ -542,12 +542,12 @@ const signupWithOTP = async (email, first_name, last_name, phone_number) => {
       return { error: error.message };
     }
 
-    try {
-      await createUserInKlaviyo({ email, first_name, last_name, phone_number });
-      await createEventInKlaviyo('Signed Up with OTP', email);
-    } catch (error) {
-      console.error('Error in create event in klaviyo:', error);
-    }
+    // try {
+    //   await createUserInKlaviyo({ email, first_name, last_name, phone_number });
+    //   await createEventInKlaviyo('Signed Up with OTP', email);
+    // } catch (error) {
+    //   console.error('Error in create event in klaviyo:', error);
+    // }
 
     return data;
   } catch (error) {
