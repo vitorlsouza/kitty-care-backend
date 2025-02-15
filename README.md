@@ -36,8 +36,7 @@ Include the Google OAuth token when making requests to protected API endpoints.
 ### Cloning the Repository
 
 ```sh
-git clone <repository_url>
-cd <repository_folder>
+git clone <[repository_url](https://github.com/vitorlsouza/kitty-care-backend.git)>
 ```
 
 ### Installing Dependencies
